@@ -1,0 +1,107 @@
+openapi: 3.0.3
+info:
+  title: Instanciateurs DDST (KISS_J)
+  description: |
+    Service facade pour les instanciateurs DDST / PND
+  version: 0.0.1-SNAPSHOT
+tags:
+  - name: v1
+components:
+  schemas:
+    Features:
+      type: array
+      items:
+        type: string
+paths:
+  /v1/instanciate:
+    get:
+      tags:
+        - v1
+      summary: Créer une instance du type demandé
+      description: Créer une instance du type demandé, avec les fonctionnalités requises
+      operationId: getSourceZip
+      parameters:
+        - name: typeDeComposant
+          in: query
+          description: Kit à instancier
+          required: true
+          schema:
+            type: string
+            default: STUMP
+            enum:
+              - HUMAN
+              - STUMP
+              - TONIC
+              - CONTRAT-OPENAPI
+              - CONTRAT-AVRO
+              - CONTRAT-SOAP
+              - LIB-JAVA
+              - LIB-NODE
+        - name: nomDuComposant
+          in: query
+          description: Nom du composant à générer
+          required: true
+          schema:
+            type: string
+        - name: groupId
+          in: query
+          description: Identifiant de groupe pour le projet Maven
+          required: false
+          schema:
+            type: string
+        - name: artifactId
+          in: query
+          description: Identifiant d'artefact pour le projet Maven
+          required: false
+          schema:
+            type: string
+        - name: features
+          in: query
+          description: Fonctionnalités à instancier
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Retourne une archive zip contenant les sources correspondant aux paramètres demandés
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Valeur de statut invalide
+
+  /v1/features:
+    get:
+      tags:
+        - v1
+      summary: Obtenir les fonctionnalités disponibles
+      description: Récupère la liste des fonctionnalités pour le type de composant spécifié
+      operationId: getFeatures
+      parameters:
+        - name: typeDeComposant
+          in: query
+          description: Type de composant (ex. HUMAN, STUMP, TONIC, CONTRAT-OPENAPI, CONTRAT-AVRO, CONTRAT-SOAP, LIB-JAVA, LIB-NODE)
+          required: true
+          schema:
+            type: string
+            enum:
+              - HUMAN
+              - STUMP
+              - TONIC
+      responses:
+        '200':
+          description: Réponse réussie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: Requête invalide

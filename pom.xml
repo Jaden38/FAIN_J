@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.cnam.toni</groupId>
+        <artifactId>toni-application-service</artifactId>
+        <version>1.3.0</version>
+    </parent>
+
+    <groupId>fr.cnam.ddst</groupId>
+    <artifactId>fainj</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <dependencies>
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Spring Boot Config Processor -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- HTTP Client -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>logging-interceptor</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.gsonfire</groupId>
+            <artifactId>gson-fire</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+
+        <!-- Jakarta -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.11.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <executions>
+                    <!-- Generate Instanciateur Server API -->
+                    <execution>
+                        <id>generate-facade-server</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi-facade.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>fr.cnam.ddst.controller.rest.api</apiPackage>
+                            <modelPackage>fr.cnam.ddst.controller.rest.model</modelPackage>
+                            <invokerPackage>fr.cnam.ddst.controller.rest.invoker</invokerPackage>
+                            <languageSpecificPrimitives>
+                                <languageSpecificPrimitive>Problem</languageSpecificPrimitive>
+                                <languageSpecificPrimitive>ProblemResponse</languageSpecificPrimitive>
+                            </languageSpecificPrimitives>
+                            <importMappings>
+                                <importMapping>
+                                    ProblemResponse=fr.cnam.toni.starter.web.core.rest.responses.ProblemResponse
+                                </importMapping>
+                                <importMapping>Problem=fr.cnam.toni.starter.web.core.rest.responses.Problem
+                                </importMapping>
+                            </importMappings>
+                            <schemaMappings>
+                                ProblemResponse=fr.cnam.toni.starter.web.core.rest.responses.ProblemResponse,Problem=fr.cnam.toni.starter.web.core.rest.responses.Problem
+                            </schemaMappings>
+                            <configOptions>
+                                <sourceFolder>src/gen/java</sourceFolder>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>false</interfaceOnly>
+                                <openApiNullable>false</openApiNullable>
+                                <useSpringBoot3>true</useSpringBoot3>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <!-- Generate Tonic Initializr Client API -->
+                    <execution>
+                        <id>generate-tcinj-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi-tcinj.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>fr.cnam.ddst.client.tonic.controller.rest.api</apiPackage>
+                            <modelPackage>fr.cnam.ddst.client.tonic.controller.rest.model</modelPackage>
+                            <invokerPackage>fr.cnam.ddst.client.tonic.controller.rest.invoker</invokerPackage>
+                            <languageSpecificPrimitives>
+                                <languageSpecificPrimitive>Problem</languageSpecificPrimitive>
+                                <languageSpecificPrimitive>ProblemResponse</languageSpecificPrimitive>
+                            </languageSpecificPrimitives>
+                            <importMappings>
+                                <importMapping>
+                                    ProblemResponse=fr.cnam.toni.starter.web.core.rest.responses.ProblemResponse
+                                </importMapping>
+                                <importMapping>Problem=fr.cnam.toni.starter.web.core.rest.responses.Problem
+                                </importMapping>
+                            </importMappings>
+                            <schemaMappings>
+                                ProblemResponse=fr.cnam.toni.starter.web.core.rest.responses.ProblemResponse,Problem=fr.cnam.toni.starter.web.core.rest.responses.Problem
+                            </schemaMappings>
+                            <configOptions>
+                                <sourceFolder>src/gen/java</sourceFolder>
+                                <delegatePattern>true</delegatePattern>
+                                <openApiNullable>false</openApiNullable>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <requestMappingMode>api_interface</requestMappingMode>
+                                <useTags>true</useTags>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
