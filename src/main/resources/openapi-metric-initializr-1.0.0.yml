@@ -1,0 +1,350 @@
+openapi: 3.0.2
+info:
+    title: Metrique instanciations des modules
+    version: 1.0.0
+    description: Exemple d'API REST implémentée par le use-case [poc-metrique-instances-stump](https://gitlab.cnqd.cnamts.fr/ddst-back/DDST-POC/spring-boot/poc-metrique-instances-stump) du starter-kit STUMP Service.
+    contact:
+        name: CNAM DDST / PER / Pole Back
+        url: 'http://pad-st.cnamts.fr/pad-ddst/catalogue/products.html?product=stump&division=dait'
+        email: ddst-back-per.cnam@assurance-maladie.fr
+servers:
+    -
+        url: http://localhost:9002/poc-metrique-instances-stump/public/rest
+        description: Poste de dév local
+    -
+        url: http://152101lj1w.csh-dijon.ramage:9002/poc-metrique-instances-stump/public/rest
+        description: Machine docker, environnement utilisé temporairement entant pour installer ce poc en mode fatjar
+paths:
+    /modules:
+        put:
+            summary: créer un module
+            operationId: putModule
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                             $ref: '#/components/schemas/ModuleResource'
+                required: true
+            tags:
+                - module
+            responses:
+                '200':
+                    $ref: '#/components/responses/ReponseOkModule'
+    /modules/{codeModule}:
+        get:
+            tags:
+                - module
+            operationId: findOneByCodeModule
+            parameters:
+                -
+                    name: codeModule
+                    in: path
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/ReponseOkModule'
+                '404':
+                    $ref: '#/components/responses/ReponseKoNonTrouvee'
+            summary: >-
+                Récuperer le module qui a un codeModule donnée
+            description: |-
+                Le codeModule est obligatoire
+        delete:
+            tags:
+                - module
+            operationId: deleteModuleByCodeModule
+            parameters:
+                -
+                    name: codeModule
+                    in: path
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                '204':
+                    $ref: '#/components/responses/ReponseOkSansContenu'
+                '404':
+                    $ref: '#/components/responses/ReponseKoNonTrouvee'
+            summary: >-
+                Supprimer le module qui a un codeModule donnée
+            description: |-
+                Le codeModule est obligatoire
+    /modules/findModulesByUsecase:
+        get:
+            tags:
+                - modulesCollection
+            operationId: findModulesByUsecase
+            parameters:
+                -
+                    name: usecases
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/ReponseOkModulesList'
+                '404':
+                    $ref: '#/components/responses/ReponseKoNonTrouvee'
+            summary: >-
+                Récuperer tous les modules avec les usecases renseignés
+            description: |-
+                usecases est obligatoire. Au format usecase1 ou usecase1,usecase2,...
+    /modules/findModulesByVersionSK:
+        get:
+            tags:
+                - modulesCollection
+            operationId: findModulesByVersionSK
+            parameters:
+                -
+                    name: versionSK
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/ReponseOkModulesList'
+                '404':
+                    $ref: '#/components/responses/ReponseKoNonTrouvee'
+            summary: >-
+                Récuperer tous les modules avec la versionSK renseignée
+            description: |-
+                versionSK est obligatoire. 
+    /modules/findModulesByTypeSK:
+        get:
+            tags:
+                - modulesCollection
+            operationId: findModulesByTypeSK
+            parameters:
+                -
+                    name: typeSK
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/ReponseOkModulesList'
+                '404':
+                    $ref: '#/components/responses/ReponseKoNonTrouvee'
+            summary: >-
+                Récuperer tous les modules avec le type de SK renseignée (stump ou skv11..)
+            description: |-
+                typeSK est obligatoire. 
+    /modules/findModulesByTypeModule:
+        get:
+            tags:
+                - modulesCollection
+            operationId: findModulesByTypeModule
+            parameters:
+                -
+                    name: typeModule
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/ReponseOkModulesList'
+                '404':
+                    $ref: '#/components/responses/ReponseKoNonTrouvee'
+            summary: >-
+                Récuperer tous les modules avec le type de SK renseignée (service, web..)
+            description: |-
+                typeModule est obligatoire. 
+    /modules/findModulesBetweenDateInstanciation:
+        get:
+            tags:
+                - modulesCollection
+            operationId: findModulesBetweenDateInstanciation
+            parameters:
+                -
+                    name: dateInstanciationFrom
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        format: date
+                -
+                    name: dateInstanciationTo
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        format: date
+            responses:
+                '200':
+                    $ref: '#/components/responses/ReponseOkModulesList'
+                '404':
+                    $ref: '#/components/responses/ReponseKoNonTrouvee'
+            summary: >-
+                Récuperer tous les modules initialisés entre ces deux dates d'instanciation
+            description: |-
+                dateInstanciationFrom et dateInstanciationTo sont obligatoires. 
+components:
+    schemas:
+        ModuleResource:
+            description: Représentation d'un module.
+            required:
+                - codeModule
+                - dateInstanciation
+                - dds
+                - typeModule
+                - typeSK
+                - versionSK
+            type: object
+            properties:
+                dds:
+                    type: string
+                codeModule:
+                    maxLength: 10
+                    minLength: 2
+                    type: string
+                dateInstanciation:
+                    type: string
+                    format: date
+                typeModule:
+                    type: string
+                typeSK:
+                    type: string
+                versionSK:
+                    type: string
+                usecases:
+                    type: string
+        ResponseOkAvecModule:
+            type: object
+            properties:
+                value:
+                    $ref: '#/components/schemas/ModuleResource'
+        ResponseOkListModule:
+            type: object
+            properties:
+                value:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ModuleResource'
+        ProblemResponse:
+            description: Liste de Problem wrappée dans un champ problems.
+            required:
+                - problems
+            type: object
+            properties:
+                problems:
+                    description: liste des problèmes
+                    minItems: 1
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Problem'
+            example:
+                problems:
+                    -
+                        id: 123e4567-e89c-12d3-a456-426614174000
+                        code: stump_4000
+                        message: >-
+                            Les données fournies dans la requête ne sont pas valides. Veuillez corriger ces
+                            données et soumettre à nouveau votre demande.
+                        details:
+                            violations:
+                                -
+                                    rang: doit être supérieur à 1
+                                -
+                                    matricule: doit être de longueur comprise entre 13 et 13
+        Problem:
+            description: Représentation d'un problème / erreur lors du traitement d'une opération.
+            required:
+                - id
+                - message
+                - code
+            type: object
+            properties:
+                id:
+                    format: uuid
+                    description: id unique de l'occurence du problème
+                    type: string
+                code:
+                    description: code problème
+                    type: string
+                message:
+                    description: message détaillé du problème
+                    type: string
+                details:
+                    description: détails supplémentaires optionnels
+                    type: object
+            example:
+                id: 123e4567-e89c-12d3-a456-426614174000
+                code: stump_4000
+                message: >-
+                    Les données fournies dans la requête ne sont pas valides. Veuillez corriger ces données et
+                    soumettre à nouveau votre demande.
+                details:
+                    violations:
+                        -
+                            rang: doit être supérieur à 1
+                        -
+                            matricule: doit être de longueur comprise entre 13 et 13
+    responses:
+        ReponseOkModule:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/ResponseOkAvecModule'
+                    examples:
+                        ExampleOkModule:
+                            value:
+                                value:
+                                    dds: 'CNAM_00828847'
+                                    dateInstanciation: '2000-03-31'
+                                    codeModule: 'XXXX_J'
+                                    typeModule: 'J'
+                                    typeSK: 'SKV11'
+                                    versionSK: '1.2.6'
+                                    usecases: 'uc-jms-camel,uc-rest-jdbc,uc-rest-camel'
+            description: Réponse contenant un module
+        ReponseKoNonTrouvee:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/ProblemResponse'
+                    examples:
+                        ExampleNonTrouvee:
+                            value:
+                                problems:
+                                    -
+                                        id: 123e4567-e89c-12d3-a456-426614174000
+                                        code: stump_4040
+                                        message: >-
+                                            La resource demandée n'a pu être trouvée. Merci de vérifier les
+                                            paramètres de votre requête.
+            description: Module inexistant
+        ReponseOkModulesList:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/ResponseOkListModule'
+                    examples:
+                        ExampleOkModule:
+                            value:
+                                value:
+                                    -
+                                        dds: 'CNAM_00828847'
+                                        dateInstanciation: '2000-03-31'
+                                        codeModule: 'XXXX_J'
+                                        typeModule: 'J'
+                                        typeSK: 'SKV11'
+                                        versionSK: '1.2.6'
+                                        usecases: 'uc-jms-camel,uc-rest-jdbc,uc-rest-camel'
+                                    -
+                                        dds: 'CNAM_20828847'
+                                        dateInstanciation: '2000-03-31'
+                                        codeModule: 'AAAX_J'
+                                        typeModule: 'J'
+                                        typeSK: 'STUMP'
+                                        versionSK: '1.2.6'
+                                        usecases: 'uc-jms-camel,uc-rest-jdbc,uc-rest-camel'
+                                        
+            description: Réponse contenant des modules
+        ReponseOkSansContenu:
+            description: Réponse indiquant un succès mais sans contenu retourné

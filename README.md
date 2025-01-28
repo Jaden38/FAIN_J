@@ -1,93 +1,120 @@
-# FAIN_J
+# FACADE_J - Service Facade pour Instanciateurs DDST
 
+## Table des matières
+1. [Aperçu](#aperçu)
+2. [Architecture](#architecture)
+3. [Points d'accès REST](#points-daccès-rest)
+4. [Configuration](#configuration)
+5. [Guide d'utilisation](#guide-dutilisation)
+    - [Cas de succès](#cas-de-succès)
+    - [Cas d'erreur](#cas-derreur)
+6. [Types de composants disponibles](#types-de-composants-disponibles)
+7. [Features disponibles](#features-disponibles)
 
+## Aperçu
 
-## Getting started
+FACADE_J est une API facade qui uniformise l'accès aux différents instanciateurs de projets DDST. Le service expose une API REST unifiée permettant de générer des projets à partir de différents starter kits tout en conservant les spécificités de chaque type de composant.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Architecture
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+L'architecture se compose de trois diagrammes principaux :
 
-## Add your files
+1. **Diagramme de séquence** - Illustre le flux d'interaction entre les composants :
+   ![Diagramme de séquence](/src/main/resources/diagrams/sequence-diagram.png)
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+2. **Diagramme de classes** - Montre la structure des classes du système :
+   ![Diagramme de classes](/src/main/resources/diagrams/class-diagram.png)
+
+3. **Diagramme de composants** - Présente l'architecture globale du système :
+   ![Diagramme de composants](/src/main/resources/diagrams/component-diagram.png)
+
+## Points d'accès REST
+
+Le service expose les endpoints suivants sur le port 9000:
+
+### GET /v1/instanciate
+Génère un nouveau projet à partir des paramètres fournis.
+
+**Paramètres:**
+- `typeDeComposant` (requis): Type du composant à générer (ex: TONIC, HUMAN, STUMP)
+- `nomDuComposant` (requis): Nom du projet
+- `groupId` (optionnel): GroupId Maven
+- `artifactId` (optionnel): ArtifactId Maven
+- `features` (optionnel): Liste des dépendances séparées par des virgules
+
+### GET /v1/features
+Retourne la liste des features disponibles pour un type de composant.
+
+**Paramètres:**
+- `typeDeComposant` (requis): Type du composant (ex: TONIC, HUMAN, STUMP)
+
+## Configuration
+
+Le service utilise un fichier `application.yml` pour sa configuration. Les principaux éléments configurables sont :
+- Port du service (par défaut: 9000)
+- URLs des services d'initialisation
+- Liste des features disponibles par type de composant
+
+## Guide d'utilisation
+
+### Cas de succès
+
+1. **Dépendance unique**
+```
+http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client
+```
+
+2. **Dépendances multiples**
+```
+http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client,toni-starter-client-espoir,toni-contract-openapi
+```
+
+3. **Sans dépendances**
+```
+http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
+```
+
+### Cas d'erreur
+
+1. **Type de composant invalide**
+```
+http://localhost:9000/v1/instanciate?typeDeComposant=INVALID&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
+```
+
+2. **Feature invalide ou mal orthographiée**
+```
+http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=toni-starter-security-authap-v2-client
+```
+
+3. **Casse incorrecte dans les features**
+```
+http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=TONI-STARTER-SECURITY-AUTHAPP-V2-CLIENT
+```
+
+## Types de composants disponibles
+
+- `HUMAN`
+- `STUMP`
+- `TONIC`
+- `CONTRAT-OPENAPI`
+- `CONTRAT-AVRO`
+- `CONTRAT-SOAP`
+- `LIB-JAVA`
+- `LIB-NODE`
+
+## Features disponibles
+
+Liste des features supportées pour les composants TONIC :
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.cnqd.cnamts.fr/tonic/initializr/fainj.git
-git branch -M master
-git push -uf origin master
+toni-starter-security-authapp-v2-client
+toni-starter-security-authapp-v3-client
+toni-starter-security-authapp-v3-server
+toni-starter-security-oauth2-agent-server
+toni-starter-jdbc
+toni-starter-amazon-s3
+toni-starter-client-espoir
+toni-starter-client-pat
+toni-contract-openapi
+toni-contract-avro
 ```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.cnqd.cnamts.fr/tonic/initializr/fainj/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
