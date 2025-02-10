@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Instanciateurs DDST (KISS_J)
+  title: API Facade DDST (FAIN_J)
   description: |
-    Service facade pour les instanciateurs DDST / PND
+    Service facade pour les instanciateurs de starter kits DDST
   version: 0.0.1-SNAPSHOT
 tags:
   - name: v1
