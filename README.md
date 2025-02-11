@@ -32,7 +32,7 @@ L'architecture se compose de trois diagrammes principaux :
 
 Le service expose les endpoints suivants sur le port 9000:
 
-### GET /v1/instanciate
+### GET /instanciate
 Génère un nouveau projet à partir des paramètres fournis.
 
 **Paramètres:**
@@ -42,7 +42,7 @@ Génère un nouveau projet à partir des paramètres fournis.
 - `artifactId` (optionnel): ArtifactId Maven
 - `features` (optionnel): Liste des dépendances séparées par des virgules
 
-### GET /v1/features
+### GET /features
 Retourne la liste des features disponibles pour un type de composant.
 
 **Paramètres:**
@@ -61,34 +61,34 @@ Le service utilise un fichier `application.yml` pour sa configuration. Les princ
 
 1. **Dépendance unique**
 ```
-http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client
+http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client
 ```
 
 2. **Dépendances multiples**
 ```
-http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client,toni-starter-client-espoir,toni-contract-openapi
+http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client,toni-starter-client-espoir,toni-contract-openapi
 ```
 
 3. **Sans dépendances**
 ```
-http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
+http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
 ```
 
 ### Cas d'erreur
 
 1. **Type de composant invalide**
 ```
-http://localhost:9000/v1/instanciate?typeDeComposant=INVALID&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
+http://localhost:9000/instanciate?typeDeComposant=INVALID&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
 ```
 
 2. **Feature invalide ou mal orthographiée**
 ```
-http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=toni-starter-security-authap-v2-client
+http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=toni-starter-security-authap-v2-client
 ```
 
 3. **Casse incorrecte dans les features**
 ```
-http://localhost:9000/v1/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=TONI-STARTER-SECURITY-AUTHAPP-V2-CLIENT
+http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=TONI-STARTER-SECURITY-AUTHAPP-V2-CLIENT
 ```
 
 ## Types de composants disponibles
