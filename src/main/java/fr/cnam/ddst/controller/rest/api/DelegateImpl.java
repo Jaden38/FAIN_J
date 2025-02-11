@@ -62,11 +62,12 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
 
     /**
      * Récupère la liste des fonctionnalités disponibles pour un type de composant spécifié.
+     * Actuellement, seul le type TONIC dispose de fonctionnalités.
      *
-     * @param typeDeComposant Le type de composant (TONIC, STUMP, HUMAN)
+     * @param typeDeComposant Le type de composant (TONIC)
      * @return ResponseEntity contenant :
-     *         - La liste des fonctionnalités si le type est valide (200 OK)
-     *         - 400 Bad Request si le type est null ou non supporté
+     *         - La liste des fonctionnalités si le type est TONIC (200 OK)
+     *         - 400 Bad Request si le type est null ou différent de TONIC
      *         - 500 Internal Server Error en cas d'erreur lors du traitement
      */
     @Override
@@ -82,11 +83,9 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
                 return ResponseEntity.ok(features);
             }
 
-            List<String> features = properties.getFeaturesForType(typeDeComposant.toLowerCase());
-            if (features != null) {
-                return ResponseEntity.ok(features);
-            }
+            log.warn("Features are only available for TONIC components. Received: {}", typeDeComposant);
             return ResponseEntity.badRequest().build();
+
         } catch (Exception e) {
             log.error("Error getting features for type {}", typeDeComposant, e);
             return ResponseEntity.internalServerError().build();

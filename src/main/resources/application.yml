@@ -6,13 +6,6 @@ initializer:
     url: http://stump-url:8080
   human:
     url: http://human-url:8080
-  features:
-    stump:
-      - test
-      - test2
-    human:
-      - test
-      - test2
 
 server:
   port: 9000
