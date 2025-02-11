@@ -10,7 +10,7 @@ paths:
     get:
       tags:
         - tonic-project-generation-controller
-      operationId: springZip
+      operationId: getProjectZip
       parameters:
         - name: dependencies
           in: query
@@ -92,6 +92,26 @@ paths:
               schema:
                 type: string
                 format: binary
+
+  /dependencies:
+    get:
+      tags:
+        - tonic-project-generation-controller
+      operationId: getDependencies
+      parameters:
+        - name: bootVersion
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/TonicDependenciesResponse'
+
 components:
   schemas:
     ProjectRequest:
@@ -126,4 +146,32 @@ components:
         javaVersion:
           type: string
         baseDir:
+          type: string
+
+    TonicDependenciesResponse:
+      type: object
+      properties:
+        bootVersion:
+          type: string
+        dependencies:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TonicDependency'
+        repositories:
+          type: object
+          additionalProperties:
+            type: object
+        boms:
+          type: object
+          additionalProperties:
+            type: object
+
+    TonicDependency:
+      type: object
+      properties:
+        groupId:
+          type: string
+        artifactId:
+          type: string
+        scope:
           type: string

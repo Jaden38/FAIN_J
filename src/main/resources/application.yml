@@ -7,17 +7,6 @@ initializer:
   human:
     url: http://human-url:8080
   features:
-    tonic:
-      - toni-starter-security-authapp-v2-client
-      - toni-starter-security-authapp-v3-client
-      - toni-starter-security-authapp-v3-server
-      - toni-starter-security-oauth2-agent-server
-      - toni-starter-jdbc
-      - toni-starter-amazon-s3
-      - toni-starter-client-espoir
-      - toni-starter-client-pat
-      - toni-contract-openapi
-      - toni-contract-avro
     stump:
       - test
       - test2

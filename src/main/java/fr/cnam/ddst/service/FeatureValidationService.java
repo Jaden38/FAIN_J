@@ -1,6 +1,7 @@
 package fr.cnam.ddst.service;
 
 import fr.cnam.ddst.config.InitializerProperties;
+import fr.cnam.ddst.service.tonic.TonicFeaturesService;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +19,16 @@ import java.util.stream.Collectors;
 public class FeatureValidationService {
 
     private final InitializerProperties properties;
+    private final TonicFeaturesService tonicFeaturesService;
 
     /**
      * Construit un nouveau service de validation avec les propriétés d'initialisation spécifiées.
      *
      * @param properties Les propriétés de configuration des instanciateurs
      */
-    public FeatureValidationService(InitializerProperties properties) {
+    public FeatureValidationService(InitializerProperties properties, TonicFeaturesService tonicFeaturesService) {
         this.properties = properties;
+        this.tonicFeaturesService = tonicFeaturesService;
     }
 
     /**
@@ -40,10 +43,16 @@ public class FeatureValidationService {
             return ValidationResult.valid(Collections.emptyList());
         }
 
-        List<String> availableFeatures = properties.getFeaturesForType(type);
-        if (availableFeatures == null) {
+        List<String> availableFeatures;
+        if ("tonic".equalsIgnoreCase(type)) {
+            availableFeatures = tonicFeaturesService.getAvailableFeatures();
+        } else {
+            availableFeatures = properties.getFeaturesForType(type);
+        }
+
+        if (availableFeatures == null || availableFeatures.isEmpty()) {
             return ValidationResult.invalid(
-                    List.of("Component type " + type + " is not supported")
+                    List.of("Component type " + type + " is not supported or no features available")
             );
         }
 

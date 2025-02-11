@@ -1,4 +1,4 @@
-# FACADE_J - Service Facade pour Instanciateurs DDST
+# FAIN_J - Service Facade pour Instanciateurs DDST
 
 ## Table des matières
 1. [Aperçu](#aperçu)
@@ -13,7 +13,7 @@
 
 ## Aperçu
 
-FACADE_J est une API facade qui uniformise l'accès aux différents instanciateurs de projets DDST. Le service expose une API REST unifiée permettant de générer des projets à partir de différents starter kits tout en conservant les spécificités de chaque type de composant.
+FAIN_J est une API facade qui uniformise l'accès aux différents instanciateurs de projets DDST. Le service expose une API REST unifiée permettant de générer des projets à partir de différents starter kits tout en conservant les spécificités de chaque type de composant.
 
 ## Architecture
 

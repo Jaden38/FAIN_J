@@ -2,7 +2,8 @@ package fr.cnam.ddst.controller.rest.api;
 
 import fr.cnam.ddst.config.InitializerProperties;
 import fr.cnam.ddst.service.FeatureValidationService;
-import fr.cnam.ddst.service.TonicProjectGenerationService;
+import fr.cnam.ddst.service.tonic.TonicFeaturesService;
+import fr.cnam.ddst.service.tonic.TonicProjectGenerationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
     private final TonicProjectGenerationService tonicProjectGenerationService;
     private final InitializerProperties properties;
     private final FeatureValidationService validationService;
+    private final TonicFeaturesService tonicFeaturesService;
 
     /**
      * Construit une nouvelle instance du délégué de l'API V1.
@@ -35,10 +37,11 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
      * @param validationService Service de validation des fonctionnalités
      */
     public V1ApiDelegateImpl(TonicProjectGenerationService tonicProjectGenerationService, InitializerProperties properties,
-                             FeatureValidationService validationService) {
+                             FeatureValidationService validationService, TonicFeaturesService tonicFeaturesService) {
         this.tonicProjectGenerationService = tonicProjectGenerationService;
         this.properties = properties;
         this.validationService = validationService;
+        this.tonicFeaturesService = tonicFeaturesService;
     }
 
     /**
@@ -54,11 +57,22 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
             log.warn("Received null typeDeComposant parameter");
             return ResponseEntity.badRequest().build();
         }
-        List<String> features = properties.getFeaturesForType(typeDeComposant.toLowerCase());
-        if (features != null) {
-            return ResponseEntity.ok(features);
+
+        try {
+            if ("tonic".equalsIgnoreCase(typeDeComposant)) {
+                List<String> features = tonicFeaturesService.getAvailableFeatures();
+                return ResponseEntity.ok(features);
+            }
+
+            List<String> features = properties.getFeaturesForType(typeDeComposant.toLowerCase());
+            if (features != null) {
+                return ResponseEntity.ok(features);
+            }
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            log.error("Error getting features for type {}", typeDeComposant, e);
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.badRequest().build();
     }
 
     /**
@@ -103,7 +117,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
 
             switch (typeDeComposant.toUpperCase()) {
                 case "TONIC":
-                    return tonicProjectGenerationService.springZip(
+                    return tonicProjectGenerationService.getProjectZip(
                             features,
                             finalGroupId,
                             finalArtifactId,

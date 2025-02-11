@@ -1,6 +1,7 @@
-package fr.cnam.ddst.service;
+package fr.cnam.ddst.service.tonic;
 
 import fr.cnam.ddst.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
+import fr.cnam.ddst.client.tonic.controller.rest.model.TonicDependenciesResponse;
 import fr.cnam.ddst.config.InitializerProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -49,7 +50,7 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
 
     /**
      * Génère un projet Spring Boot avec les paramètres spécifiés.
-     *
+     * <p>
      * Cette méthode communique avec l'instanciateur TONIC pour créer un nouveau projet
      * avec les dépendances et configurations demandées.
      *
@@ -70,7 +71,7 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
      * @return ResponseEntity contenant la ressource ZIP du projet généré
      */
     @Override
-    public ResponseEntity<Resource> springZip(
+    public ResponseEntity<Resource> getProjectZip(
             List<String> dependencies,
             String groupId,
             String artifactId,
@@ -107,6 +108,45 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
             return ResponseEntity.ok(projectZip);
         } catch (Exception e) {
             log.error("Failed to generate project", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Récupère la liste des dépendances disponibles pour une version spécifique de Spring Boot.
+     * <p>
+     * Cette méthode interroge l'instanciateur TONIC pour obtenir les dépendances
+     * disponibles pour la version de Spring Boot spécifiée. Les dépendances sont retournées
+     * sous forme d'une map où la clé est l'identifiant de la dépendance et la valeur contient
+     * les détails de la dépendance (groupId, artifactId, scope).
+     *
+     * @param bootVersion Version de Spring Boot (optionnel)
+     * @return ResponseEntity contenant les informations sur les dépendances disponibles sous forme
+     *         de TonicDependenciesResponse avec la structure {bootVersion, dependencies, repositories, boms}
+     */
+    @Override
+    public ResponseEntity<TonicDependenciesResponse> getDependencies(String bootVersion) {
+        try {
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(tonicInitializrUrl)
+                    .build();
+
+            TonicDependenciesResponse dependencies = webClient.get()
+                    .uri(uriBuilder -> {
+                        var builder = uriBuilder.path("/dependencies");
+                        if (bootVersion != null) {
+                            builder.queryParam("bootVersion", bootVersion);
+                        }
+                        return builder.build();
+                    })
+                    .retrieve()
+                    .bodyToMono(TonicDependenciesResponse.class)
+                    .doOnError(error -> log.error("Error fetching dependencies from Tonic initializer: {}", error.getMessage()))
+                    .block();
+
+            return ResponseEntity.ok(dependencies);
+        } catch (Exception e) {
+            log.error("Failed to fetch dependencies", e);
             return ResponseEntity.internalServerError().build();
         }
     }
