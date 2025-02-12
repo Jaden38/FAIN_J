@@ -1,16 +1,20 @@
 package fr.cnam.ddst.controller.rest.api;
 
-import fr.cnam.ddst.config.InitializerProperties;
 import fr.cnam.ddst.service.FeatureValidationService;
 import fr.cnam.ddst.service.tonic.TonicFeaturesService;
 import fr.cnam.ddst.service.tonic.TonicProjectGenerationService;
+import fr.cnam.toni.starter.core.exceptions.ClientException;
+import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
+import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -26,7 +30,6 @@ import java.util.Optional;
 public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate {
 
     private final TonicProjectGenerationService tonicProjectGenerationService;
-    private final InitializerProperties properties;
     private final FeatureValidationService validationService;
     private final TonicFeaturesService tonicFeaturesService;
 
@@ -34,17 +37,14 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
      * Construit une nouvelle instance du délégué de l'API.
      *
      * @param tonicProjectGenerationService Service responsable de la génération des projets TONIC
-     * @param properties                    Configuration des propriétés des instanciateurs
      * @param validationService             Service de validation des fonctionnalités
      * @param tonicFeaturesService          Service de gestion des fonctionnalités TONIC
      */
     public DelegateImpl(
             TonicProjectGenerationService tonicProjectGenerationService,
-            InitializerProperties properties,
             FeatureValidationService validationService,
             TonicFeaturesService tonicFeaturesService) {
         this.tonicProjectGenerationService = tonicProjectGenerationService;
-        this.properties = properties;
         this.validationService = validationService;
         this.tonicFeaturesService = tonicFeaturesService;
     }
@@ -65,16 +65,17 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
      * Actuellement, seul le type TONIC dispose de fonctionnalités.
      *
      * @param typeDeComposant Le type de composant (TONIC)
-     * @return ResponseEntity contenant :
-     *         - La liste des fonctionnalités si le type est TONIC (200 OK)
-     *         - 400 Bad Request si le type est null ou différent de TONIC
-     *         - 500 Internal Server Error en cas d'erreur lors du traitement
+     * @return ResponseEntity contenant la liste des fonctionnalités si le type est TONIC (200 OK)
+     * @throws ClientException avec CommonProblemType.DONNEES_INVALIDES si le type est null ou différent de TONIC (400 Bad Request)
+     * @throws ServiceException avec CommonProblemType.ERREUR_INATTENDUE en cas d'erreur lors du traitement (500 Internal Server Error)
      */
-    @Override
     public ResponseEntity<List<String>> getFeatures(String typeDeComposant) {
         if (typeDeComposant == null) {
             log.warn("Received null typeDeComposant parameter");
-            return ResponseEntity.badRequest().build();
+            throw new ClientException(
+                    CommonProblemType.DONNEES_INVALIDES,
+                    "Type de composant cannot be null"
+            );
         }
 
         try {
@@ -84,11 +85,18 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
             }
 
             log.warn("Features are only available for TONIC components. Received: {}", typeDeComposant);
-            return ResponseEntity.badRequest().build();
+            throw new ClientException(
+                    CommonProblemType.DONNEES_INVALIDES,
+                    "Features are only available for TONIC components"
+            );
 
         } catch (Exception e) {
             log.error("Error getting features for type {}", typeDeComposant, e);
-            return ResponseEntity.internalServerError().build();
+            throw new ServiceException(
+                    CommonProblemType.ERREUR_INATTENDUE,
+                    e,
+                    "Error getting features for type " + typeDeComposant
+            );
         }
     }
 
@@ -107,10 +115,10 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
      * @param groupId         ID du groupe Maven (optionnel, valeur par défaut : fr.cnam.default)
      * @param artifactId      ID de l'artefact Maven (optionnel, valeur par défaut : nomDuComposant)
      * @param features        Liste des fonctionnalités à inclure dans le projet
-     * @return ResponseEntity contenant :
-     *         - La ressource ZIP du projet généré (200 OK)
-     *         - 400 Bad Request si les paramètres ou features sont invalides
-     *         - 500 Internal Server Error en cas d'erreur lors de la génération
+     * @return ResponseEntity contenant la ressource ZIP du projet généré (200 OK)
+     * @throws ClientException avec CommonProblemType.HTTP_PARAMETRE_MANQUANT si des paramètres requis sont manquants (400 Bad Request)
+     * @throws ClientException avec CommonProblemType.DONNEES_INVALIDES si les features sont invalides ou le type non supporté (400 Bad Request)
+     * @throws ServiceException avec CommonProblemType.ERREUR_INATTENDUE en cas d'erreur lors de la génération (500 Internal Server Error)
      */
     @Override
     public ResponseEntity<Resource> getSourceZip(
@@ -123,21 +131,27 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
         log.info("Received request to generate {} project with features: {}", typeDeComposant, features);
 
         try {
+            if (typeDeComposant == null || nomDuComposant == null) {
+                Map<String, Object> details = new HashMap<>();
+                details.put("typeDeComposant", typeDeComposant == null ? "missing" : "present");
+                details.put("nomDuComposant", nomDuComposant == null ? "missing" : "present");
+
+                throw new ClientException(
+                        CommonProblemType.HTTP_PARAMETRE_MANQUANT,
+                        "Required parameters missing",
+                        details
+                );
+            }
+
             String finalGroupId = groupId != null ? groupId : "fr.cnam.default";
             String finalArtifactId = artifactId != null ? artifactId : nomDuComposant;
 
-            FeatureValidationService.ValidationResult validationResult =
-                    validationService.validateFeatures(typeDeComposant.toLowerCase(), features);
-
-            if (!validationResult.isValid()) {
-                log.warn("Invalid features requested: {}", validationResult.getErrors());
-                return ResponseEntity.badRequest().build();
-            }
+            List<String> validatedFeatures = validationService.validateFeatures(typeDeComposant.toLowerCase(), features);
 
             switch (typeDeComposant.toUpperCase()) {
                 case "TONIC":
                     return tonicProjectGenerationService.getProjectZip(
-                            features,
+                            validatedFeatures,
                             finalGroupId,
                             finalArtifactId,
                             nomDuComposant,
@@ -157,11 +171,20 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
                     log.info("Generating HUMAN project. GroupId: {}, ArtifactId: {}", finalGroupId, finalArtifactId);
                 default:
                     log.warn("Unsupported component type: {}", typeDeComposant);
-                    return ResponseEntity.badRequest().build();
+                    throw new ClientException(
+                            CommonProblemType.DONNEES_INVALIDES,
+                            "Unsupported component type: " + typeDeComposant
+                    );
             }
+        } catch (ClientException e) {
+            throw e; // Re-throw client exceptions as-is
         } catch (Exception e) {
             log.error("Error processing request", e);
-            return ResponseEntity.internalServerError().build();
+            throw new ServiceException(
+                    CommonProblemType.ERREUR_INATTENDUE,
+                    e,
+                    "Error processing request for component type: " + typeDeComposant
+            );
         }
     }
 }
