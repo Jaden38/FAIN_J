@@ -10,7 +10,38 @@ components:
       type: array
       items:
         type: string
+    ComponentType:
+      type: string
+      enum:
+        - TONIC
+        - HUMAN
+      #        - STUMP
+      #        - CONTRAT-OPENAPI
+      #        - CONTRAT-AVRO
+      #        - CONTRAT-SOAP
+      #        - LIB-JAVA
+      #        - LIB-NODE
+      default: TONIC
+    ComponentTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ComponentType'
 paths:
+  /type-composant:
+    get:
+      summary: Obtenir les types de composants disponibles
+      description: Récupère la liste des types de composants supportés par l'API
+      operationId: getComponentTypes
+      responses:
+        '200':
+          description: Liste des types de composants disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentTypes'
+        '500':
+          description: Erreur interne du serveur
+
   /instanciate:
     get:
       summary: Créer une instance du type demandé
@@ -22,17 +53,7 @@ paths:
           description: Kit à instancier
           required: true
           schema:
-            type: string
-            default: STUMP
-            enum:
-              - HUMAN
-              - STUMP
-              - TONIC
-              - CONTRAT-OPENAPI
-              - CONTRAT-AVRO
-              - CONTRAT-SOAP
-              - LIB-JAVA
-              - LIB-NODE
+            $ref: '#/components/schemas/ComponentType'
         - name: nomDuComposant
           in: query
           description: Nom du composant à générer
@@ -56,9 +77,7 @@ paths:
           description: Fonctionnalités à instancier
           required: false
           schema:
-            type: array
-            items:
-              type: string
+            $ref: '#/components/schemas/Features'
           style: form
           explode: true
       responses:
@@ -83,19 +102,13 @@ paths:
           description: Type de composant (ex. HUMAN, STUMP, TONIC, CONTRAT-OPENAPI, CONTRAT-AVRO, CONTRAT-SOAP, LIB-JAVA, LIB-NODE)
           required: true
           schema:
-            type: string
-            enum:
-              - HUMAN
-              - STUMP
-              - TONIC
+            $ref: '#/components/schemas/ComponentType'
       responses:
         '200':
           description: Réponse réussie
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                $ref: '#/components/schemas/Features'
         '400':
           description: Requête invalide

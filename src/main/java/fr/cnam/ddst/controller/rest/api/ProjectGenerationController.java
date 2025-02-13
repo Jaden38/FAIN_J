@@ -1,5 +1,6 @@
 package fr.cnam.ddst.controller.rest.api;
 
+import fr.cnam.ddst.controller.rest.model.ComponentType;
 import fr.cnam.ddst.service.FeatureValidationService;
 import fr.cnam.ddst.service.tonic.TonicFeaturesService;
 import fr.cnam.ddst.service.tonic.TonicProjectGenerationService;
@@ -11,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,33 @@ public class ProjectGenerationController implements DefaultApi {
     }
 
     /**
+     * Récupère la liste des types de composants disponibles dans le système.
+     * <p>
+     * Cette méthode retourne la liste exhaustive des types de composants actuellement
+     * supportés par l'API (TONIC, HUMAN). Les types sont définis dans l'énumération
+     * {@link ComponentType}.
+     *
+     * @return ResponseEntity contenant la liste des types de composants disponibles (200 OK)
+     * @throws ServiceException avec CommonProblemType.ERREUR_INATTENDUE en cas d'erreur
+     *         lors de la récupération des types (500 Internal Server Error)
+     */
+    @Override
+    public ResponseEntity<List<ComponentType>> getComponentTypes() {
+        try {
+            log.info("Retrieving available component types");
+            List<ComponentType> componentTypes = Arrays.asList(ComponentType.values());
+            return ResponseEntity.ok(componentTypes);
+        } catch (Exception e) {
+            log.error("Error retrieving component types", e);
+            throw new ServiceException(
+                    CommonProblemType.ERREUR_INATTENDUE,
+                    e,
+                    "Error retrieving component types"
+            );
+        }
+    }
+
+    /**
      * Récupère la liste des fonctionnalités disponibles pour un type de composant spécifié.
      * Actuellement, seul le type TONIC dispose de fonctionnalités.
      *
@@ -56,7 +85,8 @@ public class ProjectGenerationController implements DefaultApi {
      * @throws ClientException avec CommonProblemType.DONNEES_INVALIDES si le type est null ou différent de TONIC (400 Bad Request)
      * @throws ServiceException avec CommonProblemType.ERREUR_INATTENDUE en cas d'erreur lors du traitement (500 Internal Server Error)
      */
-    public ResponseEntity<List<String>> getFeatures(String typeDeComposant) {
+    @Override
+    public ResponseEntity<List<String>> getFeatures(ComponentType typeDeComposant) {
         if (typeDeComposant == null) {
             log.warn("Received null typeDeComposant parameter");
             throw new ClientException(
@@ -66,7 +96,7 @@ public class ProjectGenerationController implements DefaultApi {
         }
 
         try {
-            if ("TONIC".equalsIgnoreCase(typeDeComposant)) {
+            if (typeDeComposant == ComponentType.TONIC) {
                 List<String> features = tonicFeaturesService.getAvailableFeatures();
                 return ResponseEntity.ok(features);
             }
@@ -86,6 +116,7 @@ public class ProjectGenerationController implements DefaultApi {
             );
         }
     }
+
 
     /**
      * Génère un projet selon les paramètres spécifiés et retourne une archive ZIP contenant les sources.
@@ -109,7 +140,7 @@ public class ProjectGenerationController implements DefaultApi {
      */
     @Override
     public ResponseEntity<Resource> getSourceZip(
-            String typeDeComposant,
+            ComponentType typeDeComposant,
             String nomDuComposant,
             String groupId,
             String artifactId,
@@ -133,10 +164,13 @@ public class ProjectGenerationController implements DefaultApi {
             String finalGroupId = groupId != null ? groupId : "fr.cnam.default";
             String finalArtifactId = artifactId != null ? artifactId : nomDuComposant;
 
-            List<String> validatedFeatures = validationService.validateFeatures(typeDeComposant.toLowerCase(), features);
+            List<String> validatedFeatures = validationService.validateFeatures(
+                    typeDeComposant.toString().toLowerCase(),
+                    features
+            );
 
-            switch (typeDeComposant.toUpperCase()) {
-                case "TONIC":
+            switch (typeDeComposant) {
+                case TONIC:
                     return tonicProjectGenerationService.getProjectZip(
                             validatedFeatures,
                             finalGroupId,
@@ -153,9 +187,14 @@ public class ProjectGenerationController implements DefaultApi {
                             null, // javaVersion
                             null  // baseDir
                     );
-                case "HUMAN":
+                case HUMAN:
                     // TODO: Implement HUMAN project generation service
                     log.info("Generating HUMAN project. GroupId: {}, ArtifactId: {}", finalGroupId, finalArtifactId);
+                    log.error("HUMAN project generation not yet implemented");
+                    throw new ServiceException(
+                            CommonProblemType.ERREUR_INATTENDUE,
+                            "HUMAN project generation not yet implemented"
+                    );
                 default:
                     log.warn("Unsupported component type: {}", typeDeComposant);
                     throw new ClientException(
@@ -164,7 +203,7 @@ public class ProjectGenerationController implements DefaultApi {
                     );
             }
         } catch (ClientException e) {
-            throw e; // Re-throw client exceptions as-is
+            throw e;
         } catch (Exception e) {
             log.error("Error processing request", e);
             throw new ServiceException(
