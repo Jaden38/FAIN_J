@@ -10,51 +10,85 @@ components:
       type: array
       items:
         type: string
-    ComponentType:
+    StarterKitType:
       type: string
       enum:
         - TONIC
         - HUMAN
-      #        - STUMP
-      #        - CONTRAT-OPENAPI
-      #        - CONTRAT-AVRO
-      #        - CONTRAT-SOAP
-      #        - LIB-JAVA
-      #        - LIB-NODE
-      default: TONIC
+        - STUMP
+    ContractType:
+      type: string
+      enum:
+        - OPENAPI
+        - AVRO
+        - SOAP
+    LibraryType:
+      type: string
+      enum:
+        - JAVA
+        - NODE
     ComponentTypes:
       type: array
       items:
-        $ref: '#/components/schemas/ComponentType'
+        oneOf:
+          - $ref: '#/components/schemas/StarterKitType'
+          - $ref: '#/components/schemas/ContractType'
+          - $ref: '#/components/schemas/LibraryType'
 paths:
-  /type-composant:
+  /starter-kits/types:
     get:
-      summary: Obtenir les types de composants disponibles
-      description: Récupère la liste des types de composants supportés par l'API
-      operationId: getComponentTypes
+      summary: Obtenir les types de starter kits disponibles
+      description: Récupère la liste des types de starter kits supportés
+      operationId: getStarterKitTypes
       responses:
         '200':
-          description: Liste des types de composants disponibles
+          description: Liste des types de starter kits disponibles
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ComponentTypes'
+                type: array
+                items:
+                  $ref: '#/components/schemas/StarterKitType'
         '500':
           description: Erreur interne du serveur
 
-  /instanciate:
+  /starter-kits/{type}/features:
     get:
-      summary: Créer une instance du type demandé
-      description: Créer une instance du type demandé, avec les fonctionnalités requises
-      operationId: getSourceZip
+      summary: Obtenir les fonctionnalités disponibles pour un type de starter kit
+      description: Récupère la liste des fonctionnalités pour le type de starter kit spécifié
+      operationId: getStarterKitFeatures
       parameters:
-        - name: typeDeComposant
-          in: query
-          description: Kit à instancier
+        - name: type
+          in: path
+          description: Type de starter kit (TONIC, HUMAN, STUMP)
           required: true
           schema:
-            $ref: '#/components/schemas/ComponentType'
-        - name: nomDuComposant
+            $ref: '#/components/schemas/StarterKitType'
+      responses:
+        '200':
+          description: Liste des fonctionnalités disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Features'
+        '400':
+          description: Type de starter kit invalide
+        '500':
+          description: Erreur interne du serveur
+
+  /starter-kits/{type}/instanciate:
+    get:
+      summary: Créer une instance d'un starter kit
+      description: Créer une instance du type de starter kit demandé avec les fonctionnalités requises
+      operationId: instanciateStarterKit
+      parameters:
+        - name: type
+          in: path
+          description: Type de starter kit à instancier
+          required: true
+          schema:
+            $ref: '#/components/schemas/StarterKitType'
+        - name: componentName
           in: query
           description: Nom du composant à générer
           required: true
@@ -82,33 +116,133 @@ paths:
           explode: true
       responses:
         '200':
-          description: Retourne une archive zip contenant les sources correspondant aux paramètres demandés
+          description: Archive zip contenant les sources générées
           content:
             application/octet-stream:
               schema:
                 type: string
                 format: binary
         '400':
-          description: Valeur de statut invalide
+          description: Paramètres invalides
+        '500':
+          description: Erreur interne du serveur
 
-  /features:
+  /contracts/types:
     get:
-      summary: Obtenir les fonctionnalités disponibles
-      description: Récupère la liste des fonctionnalités pour le type de composant spécifié
-      operationId: getFeatures
-      parameters:
-        - name: typeDeComposant
-          in: query
-          description: Type de composant (ex. HUMAN, STUMP, TONIC, CONTRAT-OPENAPI, CONTRAT-AVRO, CONTRAT-SOAP, LIB-JAVA, LIB-NODE)
-          required: true
-          schema:
-            $ref: '#/components/schemas/ComponentType'
+      summary: Obtenir les types de contrats disponibles
+      description: Récupère la liste des types de contrats supportés
+      operationId: getContractTypes
       responses:
         '200':
-          description: Réponse réussie
+          description: Liste des types de contrats disponibles
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Features'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractType'
+        '500':
+          description: Erreur interne du serveur
+
+  /contracts/{type}/instanciate:
+    get:
+      summary: Créer une instance d'un contrat
+      description: Créer une instance du type de contrat demandé
+      operationId: instanciateContract
+      parameters:
+        - name: type
+          in: path
+          description: Type de contrat à instancier
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractType'
+        - name: componentName
+          in: query
+          description: Nom du composant à générer
+          required: true
+          schema:
+            type: string
+        - name: groupId
+          in: query
+          description: Identifiant de groupe pour le projet Maven
+          required: false
+          schema:
+            type: string
+        - name: artifactId
+          in: query
+          description: Identifiant d'artefact pour le projet Maven
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Archive zip contenant les sources générées
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
         '400':
-          description: Requête invalide
+          description: Paramètres invalides
+        '500':
+          description: Erreur interne du serveur
+
+  /libraries/types:
+    get:
+      summary: Obtenir les types de bibliothèques disponibles
+      description: Récupère la liste des types de bibliothèques supportés
+      operationId: getLibraryTypes
+      responses:
+        '200':
+          description: Liste des types de bibliothèques disponibles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LibraryType'
+        '500':
+          description: Erreur interne du serveur
+
+  /libraries/{type}/instanciate:
+    get:
+      summary: Créer une instance d'une bibliothèque
+      description: Créer une instance du type de bibliothèque demandé
+      operationId: instanciateLibrary
+      parameters:
+        - name: type
+          in: path
+          description: Type de bibliothèque à instancier
+          required: true
+          schema:
+            $ref: '#/components/schemas/LibraryType'
+        - name: componentName
+          in: query
+          description: Nom du composant à générer
+          required: true
+          schema:
+            type: string
+        - name: groupId
+          in: query
+          description: Identifiant de groupe pour le projet Maven
+          required: false
+          schema:
+            type: string
+        - name: artifactId
+          in: query
+          description: Identifiant d'artefact pour le projet Maven
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Archive zip contenant les sources générées
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Paramètres invalides
+        '500':
+          description: Erreur interne du serveur

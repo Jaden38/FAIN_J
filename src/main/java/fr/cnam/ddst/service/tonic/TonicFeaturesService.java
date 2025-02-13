@@ -7,10 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service de gestion des fonctionnalités disponibles dans TONIC.
@@ -24,7 +22,10 @@ import java.util.Map;
 public class TonicFeaturesService {
 
     private final TonicProjectGenerationService tonicService;
-
+    private static final List<String> CONTRACT_FEATURES = Arrays.asList(
+            "toni-contract-openapi",
+            "toni-contract-avro"
+    );
     /**
      * Construit un nouveau service de gestion des fonctionnalités TONIC.
      *
@@ -66,7 +67,9 @@ public class TonicFeaturesService {
                 return new ArrayList<>();
             }
 
-            return new ArrayList<>(dependencies.getDependencies().keySet());
+            return dependencies.getDependencies().keySet().stream()
+                    .filter(feature -> !CONTRACT_FEATURES.contains(feature))
+                    .collect(Collectors.toCollection(ArrayList::new));
 
         } catch (ServiceException e) {
             throw e;

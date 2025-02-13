@@ -7,13 +7,12 @@
 4. [Guide d'utilisation](#guide-dutilisation)
    - [Cas de succès](#cas-de-succès)
    - [Cas d'erreur](#cas-derreur)
-5. [Types de composants disponibles](#types-de-composants-disponibles)
-6. [Features disponibles](#features-disponibles)
-7. [Configuration technique](#configuration-technique)
+5. [Types disponibles](#types-disponibles)
+6. [Configuration technique](#configuration-technique)
 
 ## Aperçu
 
-FAIN_J est une API facade qui uniformise l'accès aux différents instanciateurs de projets DDST. Le service expose une API REST unifiée permettant de générer des projets à partir de différents starter kits tout en conservant les spécificités de chaque type de composant.
+FAIN_J est une API facade qui uniformise l'accès aux différents instanciateurs de projets DDST. Le service expose une API REST unifiée permettant de générer des projets à partir de différents starter kits, contrats et bibliothèques.
 
 ## Architecture
 
@@ -30,89 +29,134 @@ L'architecture se compose de trois diagrammes principaux :
 
 ## Points d'accès REST
 
-Le service expose les endpoints suivants sur le port 9000:
+Le service expose les endpoints suivants :
 
-### GET /type-composant
-Récupère la liste des types de composants disponibles.
+### Starter Kits
 
-**Réponse:** Liste des types de composants supportés (TONIC, HUMAN)
+#### GET /starter-kits/types
+Récupère la liste des types de starter kits disponibles.
 
-### GET /instanciate
-Génère un nouveau projet à partir des paramètres fournis.
+**Réponse:** Liste des types supportés (TONIC, HUMAN, STUMP)
+
+#### GET /starter-kits/{type}/features
+Retourne la liste des features disponibles pour un type de starter kit.
 
 **Paramètres:**
-- `typeDeComposant` (requis): Type du composant à générer (ex: TONIC, HUMAN)
-- `nomDuComposant` (requis): Nom du projet
+- `type` (chemin, requis): Type du starter kit (TONIC, HUMAN, STUMP)
+
+#### GET /starter-kits/{type}/instanciate
+Génère un nouveau projet starter kit.
+
+**Paramètres:**
+- `type` (chemin, requis): Type du starter kit
+- `componentName` (requis): Nom du projet
 - `groupId` (optionnel): GroupId Maven (défaut: fr.cnam.default)
-- `artifactId` (optionnel): ArtifactId Maven (défaut: nomDuComposant)
-- `features` (optionnel): Liste des dépendances séparées par des virgules
+- `artifactId` (optionnel): ArtifactId Maven (défaut: componentName)
+- `features` (optionnel): Liste des features à inclure
 
-### GET /features
-Retourne la liste des features disponibles pour un type de composant.
+### Contracts
+
+#### GET /contracts/types
+Récupère la liste des types de contrats disponibles.
+
+**Réponse:** Liste des types supportés (OPENAPI, AVRO, SOAP)
+
+#### GET /contracts/{type}/instanciate
+Génère un nouveau projet de contrat.
 
 **Paramètres:**
-- `typeDeComposant` (requis): Type du composant (ex: TONIC, HUMAN)
+- `type` (chemin, requis): Type du contrat
+- `componentName` (requis): Nom du projet
+- `groupId` (optionnel): GroupId Maven
+- `artifactId` (optionnel): ArtifactId Maven
+
+### Libraries
+
+#### GET /libraries/types
+Récupère la liste des types de bibliothèques disponibles.
+
+**Réponse:** Liste des types supportés (JAVA, NODE)
+
+#### GET /libraries/{type}/instanciate
+Génère un nouveau projet de bibliothèque.
+
+**Paramètres:**
+- `type` (chemin, requis): Type de la bibliothèque
+- `componentName` (requis): Nom du projet
+- `groupId` (optionnel): GroupId Maven
+- `artifactId` (optionnel): ArtifactId Maven
 
 ## Guide d'utilisation
 
 ### Cas de succès
 
-1. **Dépendance unique**
+1. **Starter Kit TONIC avec une feature**
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client
-```
-
-2. **Dépendances multiples**
-```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client,toni-starter-client-espoir,toni-contract-openapi
+http://localhost:9000/starter-kits/TONIC/instanciate?componentName=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client
 ```
 
-3. **Sans dépendances**
+2. **Starter Kit TONIC avec plusieurs features**
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
+http://localhost:9000/starter-kits/TONIC/instanciate?componentName=test-project&features=toni-starter-security-authapp-v2-client,toni-starter-client-espoir
+```
+
+3. **Contrat OpenAPI**
+```
+http://localhost:9000/contracts/OPENAPI/instanciate?componentName=my-api&groupId=fr.cnam.api
+```
+
+4. **Bibliothèque Java**
+```
+http://localhost:9000/libraries/JAVA/instanciate?componentName=my-lib&groupId=fr.cnam.lib
 ```
 
 ### Cas d'erreur
 
-1. **Type de composant invalide**
+1. **Type de starter kit invalide**
 ```
-http://localhost:9000/instanciate?typeDeComposant=INVALID&nomDuComposant=test-project
+http://localhost:9000/starter-kits/INVALID/instanciate?componentName=test-project
 ```
-Réponse: 400 Bad Request - Type de composant non supporté
+Réponse: 400 Bad Request - Type de starter kit non supporté
 
-2. **Feature invalide ou mal orthographiée**
+2. **Feature invalide pour TONIC**
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=toni-starter-security-authap-v2-client
+http://localhost:9000/starter-kits/TONIC/instanciate?componentName=test-project&features=invalid-feature
 ```
 Réponse: 400 Bad Request - Feature non disponible
 
-3. **Casse incorrecte dans les features**
+3. **Paramètres requis manquants**
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=TONI-STARTER-SECURITY-AUTHAPP-V2-CLIENT
+http://localhost:9000/starter-kits/TONIC/instanciate
 ```
-Réponse: 400 Bad Request - Feature non reconnue
+Réponse: 400 Bad Request - Paramètre componentName manquant
 
-4. **Paramètres requis manquants**
+4. **Type non implémenté**
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC
+http://localhost:9000/starter-kits/HUMAN/instanciate?componentName=test-project
 ```
-Réponse: 400 Bad Request - Paramètre nomDuComposant manquant
+Réponse: 500 Internal Server Error - Type non encore implémenté
 
-5. **Type de composant non implémenté**
-```
-http://localhost:9000/instanciate?typeDeComposant=HUMAN&nomDuComposant=test-project
-```
-Réponse: 500 Internal Server Error - Type de composant non encore implémenté
+## Types disponibles
 
-## Types de composants disponibles
+### Starter Kits
+- `TONIC` (implémenté)
+- `HUMAN` (non implémenté)
+- `STUMP` (non implémenté)
 
-Actuellement supportés :
-- `TONIC`
-- `HUMAN`
+### Contracts
+- `OPENAPI` (non implémenté)
+- `AVRO` (non implémenté)
+- `SOAP` (non implémenté)
 
-## Features disponibles
+### Libraries
+- `JAVA` (non implémenté)
+- `NODE` (non implémenté)
 
-Les features sont uniquement disponibles pour les composants TONIC. La liste des features disponibles est dynamiquement récupérée depuis le service TONIC et peut inclure :
+Note: Actuellement, seul le starter kit TONIC est pleinement implémenté. Les autres types sont listés mais pas encore disponibles.
+
+### Features TONIC disponibles
+
+Les features sont uniquement disponibles pour le starter kit TONIC. La liste des features disponibles est dynamiquement récupérée depuis le service TONIC et peut inclure :
 
 - toni-starter-security-authapp-v2-client
 - toni-starter-security-authapp-v3-client

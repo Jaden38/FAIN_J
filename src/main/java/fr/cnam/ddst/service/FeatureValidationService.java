@@ -1,5 +1,6 @@
 package fr.cnam.ddst.service;
 
+import fr.cnam.ddst.controller.rest.model.StarterKitType;
 import fr.cnam.ddst.service.tonic.TonicFeaturesService;
 import fr.cnam.toni.starter.core.exceptions.ClientException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
@@ -35,7 +36,7 @@ public class FeatureValidationService {
     /**
      * Valide une liste de fonctionnalités pour un type d'instanciateur donné.
      *
-     * @param type Le type d'instanciateur (TONIC, HUMAN)
+     * @param type Le type d'instanciateur (StarterKitType.TONIC, StarterKitType.HUMAN, StarterKitType.STUMP)
      * @param requestedFeatures La liste des fonctionnalités à valider. Si null ou vide,
      *                         retourne une liste vide.
      * @return La liste des fonctionnalités validées si toutes sont valides
@@ -45,7 +46,7 @@ public class FeatureValidationService {
      *         - Aucune fonctionnalité n'est disponible pour ce type
      *         - Une ou plusieurs fonctionnalités demandées ne sont pas disponibles
      */
-    public List<String> validateFeatures(String type, List<String> requestedFeatures) {
+    public List<String> validateFeatures(StarterKitType type, List<String> requestedFeatures) {
         if (type == null) {
             log.warn("Component type cannot be null");
             throw new ClientException(
@@ -54,13 +55,11 @@ public class FeatureValidationService {
             );
         }
 
-        String normalizedType = type.toLowerCase();
-
-        if (!normalizedType.equals("tonic")) {
-            log.warn("Invalid component type: {}. Supported type is: tonic", type);
+        if (type != StarterKitType.TONIC) {
+            log.warn("Invalid component type: {}. Only TONIC is currently supported", type);
             throw new ClientException(
                     CommonProblemType.DONNEES_INVALIDES,
-                    "Invalid component type: " + type + ". Supported type is: tonic"
+                    "Invalid component type: " + type + ". Only TONIC is currently supported"
             );
         }
 
