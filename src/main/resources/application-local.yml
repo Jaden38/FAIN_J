@@ -1,10 +1,8 @@
 initializer:
   tonic:
     url: http://localhost:8080
-  stump:
-    url: http://localhost:8081
   human:
-    url: http://localhost:8082
+    url: http://localhost:8081
 
 server:
   port: 9000
