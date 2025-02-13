@@ -138,9 +138,11 @@
                             <configOptions>
                                 <sourceFolder>src/gen/java</sourceFolder>
                                 <delegatePattern>true</delegatePattern>
-                                <interfaceOnly>false</interfaceOnly>
                                 <openApiNullable>false</openApiNullable>
                                 <useSpringBoot3>true</useSpringBoot3>
+                                <requestMappingMode>api_interface</requestMappingMode>
+                                <useTags>true</useTags>
+                                <interfaceOnly>true</interfaceOnly>
                             </configOptions>
                         </configuration>
                     </execution>

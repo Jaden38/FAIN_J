@@ -10,12 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Implémentation des délégués de l'API qui gère les requêtes REST pour la génération de projets
@@ -27,7 +25,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate {
+public class DelegateImpl implements DefaultApi {
 
     private final TonicProjectGenerationService tonicProjectGenerationService;
     private final FeatureValidationService validationService;
@@ -47,17 +45,6 @@ public class DelegateImpl implements InstanciateApiDelegate, FeaturesApiDelegate
         this.tonicProjectGenerationService = tonicProjectGenerationService;
         this.validationService = validationService;
         this.tonicFeaturesService = tonicFeaturesService;
-    }
-
-    /**
-     * Implémentation de la méthode getRequest commune aux deux interfaces.
-     * Résout le conflit de méthodes par défaut entre les interfaces.
-     *
-     * @return Optional contenant la requête web native si disponible
-     */
-    @Override
-    public Optional<NativeWebRequest> getRequest() {
-        return InstanciateApiDelegate.super.getRequest();
     }
 
     /**
