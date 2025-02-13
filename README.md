@@ -4,12 +4,12 @@
 1. [Aperçu](#aperçu)
 2. [Architecture](#architecture)
 3. [Points d'accès REST](#points-daccès-rest)
-4. [Configuration](#configuration)
-5. [Guide d'utilisation](#guide-dutilisation)
-    - [Cas de succès](#cas-de-succès)
-    - [Cas d'erreur](#cas-derreur)
-6. [Types de composants disponibles](#types-de-composants-disponibles)
-7. [Features disponibles](#features-disponibles)
+4. [Guide d'utilisation](#guide-dutilisation)
+   - [Cas de succès](#cas-de-succès)
+   - [Cas d'erreur](#cas-derreur)
+5. [Types de composants disponibles](#types-de-composants-disponibles)
+6. [Features disponibles](#features-disponibles)
+7. [Configuration technique](#configuration-technique)
 
 ## Aperçu
 
@@ -32,28 +32,26 @@ L'architecture se compose de trois diagrammes principaux :
 
 Le service expose les endpoints suivants sur le port 9000:
 
+### GET /type-composant
+Récupère la liste des types de composants disponibles.
+
+**Réponse:** Liste des types de composants supportés (TONIC, HUMAN)
+
 ### GET /instanciate
 Génère un nouveau projet à partir des paramètres fournis.
 
 **Paramètres:**
-- `typeDeComposant` (requis): Type du composant à générer (ex: TONIC, HUMAN, STUMP)
+- `typeDeComposant` (requis): Type du composant à générer (ex: TONIC, HUMAN)
 - `nomDuComposant` (requis): Nom du projet
-- `groupId` (optionnel): GroupId Maven
-- `artifactId` (optionnel): ArtifactId Maven
+- `groupId` (optionnel): GroupId Maven (défaut: fr.cnam.default)
+- `artifactId` (optionnel): ArtifactId Maven (défaut: nomDuComposant)
 - `features` (optionnel): Liste des dépendances séparées par des virgules
 
 ### GET /features
 Retourne la liste des features disponibles pour un type de composant.
 
 **Paramètres:**
-- `typeDeComposant` (requis): Type du composant (ex: TONIC, HUMAN, STUMP)
-
-## Configuration
-
-Le service utilise un fichier `application.yml` pour sa configuration. Les principaux éléments configurables sont :
-- Port du service (par défaut: 9000)
-- URLs des services d'initialisation
-- Liste des features disponibles par type de composant
+- `typeDeComposant` (requis): Type du composant (ex: TONIC, HUMAN)
 
 ## Guide d'utilisation
 
@@ -78,43 +76,62 @@ http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-proj
 
 1. **Type de composant invalide**
 ```
-http://localhost:9000/instanciate?typeDeComposant=INVALID&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
+http://localhost:9000/instanciate?typeDeComposant=INVALID&nomDuComposant=test-project
 ```
+Réponse: 400 Bad Request - Type de composant non supporté
 
 2. **Feature invalide ou mal orthographiée**
 ```
 http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=toni-starter-security-authap-v2-client
 ```
+Réponse: 400 Bad Request - Feature non disponible
 
 3. **Casse incorrecte dans les features**
 ```
 http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=TONI-STARTER-SECURITY-AUTHAPP-V2-CLIENT
 ```
+Réponse: 400 Bad Request - Feature non reconnue
+
+4. **Paramètres requis manquants**
+```
+http://localhost:9000/instanciate?typeDeComposant=TONIC
+```
+Réponse: 400 Bad Request - Paramètre nomDuComposant manquant
+
+5. **Type de composant non implémenté**
+```
+http://localhost:9000/instanciate?typeDeComposant=HUMAN&nomDuComposant=test-project
+```
+Réponse: 500 Internal Server Error - Type de composant non encore implémenté
 
 ## Types de composants disponibles
 
-- `HUMAN`
-- `STUMP`
+Actuellement supportés :
 - `TONIC`
-- `CONTRAT-OPENAPI`
-- `CONTRAT-AVRO`
-- `CONTRAT-SOAP`
-- `LIB-JAVA`
-- `LIB-NODE`
+- `HUMAN`
 
 ## Features disponibles
 
-Liste des features supportées pour les composants TONIC :
+Les features sont uniquement disponibles pour les composants TONIC. La liste des features disponibles est dynamiquement récupérée depuis le service TONIC et peut inclure :
 
-```
-toni-starter-security-authapp-v2-client
-toni-starter-security-authapp-v3-client
-toni-starter-security-authapp-v3-server
-toni-starter-security-oauth2-agent-server
-toni-starter-jdbc
-toni-starter-amazon-s3
-toni-starter-client-espoir
-toni-starter-client-pat
-toni-contract-openapi
-toni-contract-avro
-```
+- toni-starter-security-authapp-v2-client
+- toni-starter-security-authapp-v3-client
+- toni-starter-security-authapp-v3-server
+- toni-starter-security-oauth2-agent-server
+- toni-starter-jdbc
+- toni-starter-amazon-s3
+- toni-starter-client-espoir
+- toni-starter-client-pat
+- toni-contract-openapi
+- toni-contract-avro
+
+## Configuration technique
+
+Le projet utilise :
+- Spring Boot 3.x
+- Java 17+
+- Maven
+- OpenAPI Generator pour la génération des clients et des contrôleurs
+- WebClient pour les appels HTTP
+- Lombok pour la réduction du boilerplate
+- SpringDoc pour la documentation OpenAPI

@@ -1,11 +1,6 @@
 initializer:
   tonic:
-    url: http://localhost:8080
-    #url: https://tcin-j-dev-service.apps.ocp-app1-dij1-bo.hp.csh-dijon.ramage (ajouter contrat, sun security block)
-  stump:
-    url: http://stump-url:8080
-  human:
-    url: http://human-url:8080
+    url: ${TONIC_URL}
 
 server:
   port: 9000

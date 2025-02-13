@@ -1,0 +1,15 @@
+initializer:
+  tonic:
+    url: http://localhost:8080
+  human:
+    url: http://localhost:8081
+
+server:
+  port: 9000
+
+springdoc:
+  api-docs:
+    version: openapi_3_0
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
