@@ -9,7 +9,7 @@ import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +24,8 @@ import java.util.Map;
  * services pour la validation des features et la génération des projets.
  */
 @Slf4j
-@Service
-public class DelegateImpl implements DefaultApi {
+@RestController
+public class ProjectGenerationController implements DefaultApi {
 
     private final TonicProjectGenerationService tonicProjectGenerationService;
     private final FeatureValidationService validationService;
@@ -38,7 +38,7 @@ public class DelegateImpl implements DefaultApi {
      * @param validationService             Service de validation des fonctionnalités
      * @param tonicFeaturesService          Service de gestion des fonctionnalités TONIC
      */
-    public DelegateImpl(
+    public ProjectGenerationController(
             TonicProjectGenerationService tonicProjectGenerationService,
             FeatureValidationService validationService,
             TonicFeaturesService tonicFeaturesService) {
