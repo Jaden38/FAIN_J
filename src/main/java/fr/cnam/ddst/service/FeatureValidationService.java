@@ -35,12 +35,13 @@ public class FeatureValidationService {
     /**
      * Valide une liste de fonctionnalités pour un type d'instanciateur donné.
      *
-     * @param type Le type d'instanciateur (TONIC, STUMP, HUMAN)
-     * @param requestedFeatures La liste des fonctionnalités à valider
+     * @param type Le type d'instanciateur (TONIC, HUMAN)
+     * @param requestedFeatures La liste des fonctionnalités à valider. Si null ou vide,
+     *                         retourne une liste vide.
      * @return La liste des fonctionnalités validées si toutes sont valides
      * @throws ClientException avec CommonProblemType.DONNEES_INVALIDES si :
      *         - Le type de composant est null
-     *         - Le type de composant n'est pas supporté
+     *         - Le type de composant n'est pas TONIC
      *         - Aucune fonctionnalité n'est disponible pour ce type
      *         - Une ou plusieurs fonctionnalités demandées ne sont pas disponibles
      */

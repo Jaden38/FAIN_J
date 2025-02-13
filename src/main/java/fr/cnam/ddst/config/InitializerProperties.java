@@ -12,7 +12,7 @@ import java.util.Map;
  * Configuration des propriétés pour les différents instanciateurs de projets.
  * <p>
  * Cette classe gère la configuration des URLs et des fonctionnalités disponibles pour chaque
- * type d'instanciateur (TONIC, STUMP, HUMAN). Les propriétés sont chargées depuis le fichier
+ * type d'instanciateur (TONIC, HUMAN). Les propriétés sont chargées depuis le fichier
  * de configuration application.yml.
  *
  * @see org.springframework.boot.context.properties.ConfigurationProperties
@@ -28,11 +28,6 @@ public class InitializerProperties {
      * Configuration spécifique à l'instanciateur TONIC.
      */
     private Map<String, Object> tonic;
-
-    /**
-     * Configuration spécifique à l'instanciateur STUMP.
-     */
-    private Map<String, Object> stump;
 
     /**
      * Configuration spécifique à l'instanciateur HUMAN.
@@ -54,15 +49,6 @@ public class InitializerProperties {
     }
 
     /**
-     * Récupère l'URL de l'instanciateur STUMP.
-     *
-     * @return L'URL de l'instanciateur STUMP
-     */
-    public String getStumpUrl() {
-        return (String) stump.get("url");
-    }
-
-    /**
      * Récupère l'URL de l'instanciateur HUMAN.
      *
      * @return L'URL de l'instanciateur HUMAN
@@ -74,7 +60,7 @@ public class InitializerProperties {
     /**
      * Récupère la liste des fonctionnalités disponibles pour un type d'instanciateur donné.
      *
-     * @param type Le type d'instanciateur (TONIC, STUMP, HUMAN)
+     * @param type Le type d'instanciateur (TONIC, HUMAN)
      * @return La liste des fonctionnalités disponibles pour ce type
      */
     public List<String> getFeaturesForType(String type) {

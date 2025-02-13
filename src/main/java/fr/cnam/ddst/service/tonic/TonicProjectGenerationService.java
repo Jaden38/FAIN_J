@@ -10,13 +10,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Service de génération de projets utilisant l'initialisateur TONIC.
@@ -30,17 +34,34 @@ import java.util.Optional;
 @Service
 public class TonicProjectGenerationService implements TonicProjectGenerationControllerApi {
 
+    /**
+     * Client web pour communiquer avec le service TONIC.
+     */
     private final WebClient webClient;
+
+    /**
+     * Constante définissant le délai maximum d'attente pour la génération d'un projet.
+     * Si la génération dépasse cette durée, une exception est levée.
+     */
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
     /**
      * Construit un nouveau service de génération de projets TONIC.
      *
      * @param properties Les propriétés de configuration contenant l'URL du service TONIC
+     * @throws ServiceException si l'URL du service TONIC n'est pas configurée correctement
      */
     public TonicProjectGenerationService(InitializerProperties properties) {
         String tonicInitializrUrl = properties.getTonicUrl();
         this.webClient = WebClient.builder()
                 .baseUrl(tonicInitializrUrl)
+                .defaultRequest(req -> req.header("User-Agent", "TonicProjectGenerationService"))
+                .filter(ExchangeFilterFunction.ofRequestProcessor(
+                        clientRequest -> {
+                            log.debug("Request: {} {}", clientRequest.method(), clientRequest.url());
+                            return Mono.just(clientRequest);
+                        }
+                ))
                 .build();
         log.info("Initialized TonicProjectGenerationService with URL: {}", tonicInitializrUrl);
     }
@@ -103,6 +124,14 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
                             .build())
                     .retrieve()
                     .bodyToMono(Resource.class)
+                    .timeout(TIMEOUT)
+                    .onErrorMap(TimeoutException.class, ex ->
+                            new ServiceException(
+                                    CommonProblemType.ERREUR_INATTENDUE,
+                                    ex,
+                                    "Timeout while generating project"
+                            )
+                    )
                     .block();
 
             if (projectZip == null) {
