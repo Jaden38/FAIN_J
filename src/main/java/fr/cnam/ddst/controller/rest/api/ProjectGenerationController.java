@@ -164,13 +164,12 @@ public class ProjectGenerationController implements DefaultApi {
             String finalGroupId = groupId != null ? groupId : "fr.cnam.default";
             String finalArtifactId = artifactId != null ? artifactId : nomDuComposant;
 
-            List<String> validatedFeatures = validationService.validateFeatures(
-                    typeDeComposant.toString().toLowerCase(),
-                    features
-            );
-
             switch (typeDeComposant) {
                 case TONIC:
+                    List<String> validatedFeatures = validationService.validateFeatures(
+                            typeDeComposant.toString().toLowerCase(),
+                            features
+                    );
                     return tonicProjectGenerationService.getProjectZip(
                             validatedFeatures,
                             finalGroupId,
