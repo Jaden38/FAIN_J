@@ -15,16 +15,6 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
  */
 
 @SpringBootApplication
-@ComponentScan(
-        basePackages = {
-                "fr.cnam.ddst.controller.rest",
-                "fr.cnam.ddst.service",
-                "fr.cnam.ddst.config",
-                "org.openapitools.configuration"
-        },
-        nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class,
-        lazyInit = true
-)
 public class Application {
 
     /**
