@@ -36,17 +36,13 @@ public class FeatureValidationService {
     /**
      * Valide une liste de fonctionnalités pour un type d'instanciateur donné.
      *
-     * @param type Le type d'instanciateur (StarterKitType.TONIC, StarterKitType.HUMAN, StarterKitType.STUMP)
-     * @param requestedFeatures La liste des fonctionnalités à valider. Si null ou vide,
-     *                         retourne une liste vide.
-     * @return La liste des fonctionnalités validées si toutes sont valides
-     * @throws ClientException avec CommonProblemType.DONNEES_INVALIDES si :
-     *         - Le type de composant est null
-     *         - Le type de composant n'est pas TONIC
-     *         - Aucune fonctionnalité n'est disponible pour ce type
-     *         - Une ou plusieurs fonctionnalités demandées ne sont pas disponibles
+     * @param type Le type d'instanciateur
+     * @param requestedFeatures La liste des fonctionnalités à valider
+     * @param allowContractFeatures Si true, permet la validation des fonctionnalités de contrat
+     * @return La liste des fonctionnalités validées
+     * @throws ClientException si les fonctionnalités sont invalides
      */
-    public List<String> validateFeatures(StarterKitType type, List<String> requestedFeatures) {
+    public List<String> validateFeatures(StarterKitType type, List<String> requestedFeatures, boolean allowContractFeatures) {
         if (type == null) {
             log.warn("Component type cannot be null");
             throw new ClientException(
@@ -68,7 +64,20 @@ public class FeatureValidationService {
             return Collections.emptyList();
         }
 
-        List<String> availableFeatures = tonicFeaturesService.getAvailableFeatures();
+        if (!allowContractFeatures) {
+            boolean hasContractFeatures = requestedFeatures.stream()
+                    .anyMatch(feature -> feature.startsWith("toni-contract-"));
+
+            if (hasContractFeatures) {
+                log.warn("Contract features detected when not allowed: {}", requestedFeatures);
+                throw new ClientException(
+                        CommonProblemType.DONNEES_INVALIDES,
+                        "Contract features are not allowed in this context"
+                );
+            }
+        }
+
+        List<String> availableFeatures = tonicFeaturesService.getAvailableFeatures(allowContractFeatures);
         if (availableFeatures == null || availableFeatures.isEmpty()) {
             log.warn("No features available for component type: {}", type);
             throw new ClientException(
@@ -99,5 +108,13 @@ public class FeatureValidationService {
         log.info("Successfully validated {} features for type {}", requestedFeatures.size(), type);
         log.debug("Validated features: {}", requestedFeatures);
         return requestedFeatures;
+    }
+
+    /**
+     * Version surchargée qui garde la compatibilité avec l'ancien code.
+     * Par défaut, n'autorise pas les fonctionnalités de contrat.
+     */
+    public List<String> validateFeatures(StarterKitType type, List<String> requestedFeatures) {
+        return validateFeatures(type, requestedFeatures, false);
     }
 }

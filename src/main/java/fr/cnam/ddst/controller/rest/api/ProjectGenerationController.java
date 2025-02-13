@@ -118,29 +118,13 @@ public class ProjectGenerationController implements DefaultApi {
     }
 
     @Override
-    public ResponseEntity<Resource> instanciateContract(
-            ContractType type,
+    public ResponseEntity<Resource> instanciateStarterKit(
+            StarterKitType starterKitType,
             String componentName,
             String groupId,
-            String artifactId) {
-        log.info("Received request to generate {} contract", type);
-
-        if (type == ContractType.OPENAPI || type == ContractType.AVRO) {
-            String contractFeature = type == ContractType.OPENAPI ? "toni-contract-openapi" : "toni-contract-avro";
-            return instanciateStarterKit(
-                    StarterKitType.TONIC,
-                    componentName,
-                    groupId,
-                    artifactId,
-                    Collections.singletonList(contractFeature)
-            );
-        }
-
-        log.warn("Contract generation not yet implemented for type: {}", type);
-        throw new ServiceException(
-                CommonProblemType.ERREUR_INATTENDUE,
-                "Contract generation not yet implemented for type: " + type
-        );
+            String artifactId,
+            List<String> features) {
+        return internalInstanciateStarterKit(starterKitType, componentName, groupId, artifactId, features, true);
     }
 
     @Override
@@ -157,12 +141,39 @@ public class ProjectGenerationController implements DefaultApi {
     }
 
     @Override
-    public ResponseEntity<Resource> instanciateStarterKit(
+    public ResponseEntity<Resource> instanciateContract(
+            ContractType type,
+            String componentName,
+            String groupId,
+            String artifactId) {
+        log.info("Received request to generate {} contract", type);
+
+        if (type == ContractType.OPENAPI || type == ContractType.AVRO) {
+            String contractFeature = type == ContractType.OPENAPI ? "toni-contract-openapi" : "toni-contract-avro";
+            return internalInstanciateStarterKit(
+                    StarterKitType.TONIC,
+                    componentName,
+                    groupId,
+                    artifactId,
+                    Collections.singletonList(contractFeature),
+                    false
+            );
+        }
+
+        log.warn("Contract generation not yet implemented for type: {}", type);
+        throw new ServiceException(
+                CommonProblemType.ERREUR_INATTENDUE,
+                "Contract generation not yet implemented for type: " + type
+        );
+    }
+
+    private ResponseEntity<Resource> internalInstanciateStarterKit(
             StarterKitType starterKitType,
             String componentName,
             String groupId,
             String artifactId,
-            List<String> features) {
+            List<String> features,
+            boolean validateContractFeatures) {
 
         log.info("Received request to generate {} starter kit with features: {}", starterKitType, features);
 
@@ -183,9 +194,19 @@ public class ProjectGenerationController implements DefaultApi {
             String finalArtifactId = artifactId != null ? artifactId : componentName;
 
             if (starterKitType == StarterKitType.TONIC) {
+                if (validateContractFeatures && features != null && features.stream()
+                        .anyMatch(feature -> feature.startsWith("toni-contract-"))) {
+                    log.warn("Contract features are not allowed in starter kit generation. Use /contracts endpoint instead.");
+                    throw new ClientException(
+                            CommonProblemType.DONNEES_INVALIDES,
+                            "Contract features are not allowed in starter kit generation. Use /contracts endpoint instead."
+                    );
+                }
+
                 List<String> validatedFeatures = validationService.validateFeatures(
                         starterKitType,
-                        features
+                        features,
+                        !validateContractFeatures
                 );
                 return tonicProjectGenerationService.getProjectZip(
                         validatedFeatures,

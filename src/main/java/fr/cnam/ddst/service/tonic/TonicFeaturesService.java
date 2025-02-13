@@ -10,42 +10,29 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Service de gestion des fonctionnalités disponibles dans TONIC.
- * <p>
- * Ce service est responsable de la récupération et de la gestion des fonctionnalités
- * (dépendances) disponibles dans le service TONIC. Il agit comme une couche d'abstraction
- * entre le service de génération de projets TONIC et le reste de l'application.
- */
 @Slf4j
 @Service
 public class TonicFeaturesService {
 
     private final TonicProjectGenerationService tonicService;
+
     private static final List<String> CONTRACT_FEATURES = Arrays.asList(
             "toni-contract-openapi",
             "toni-contract-avro"
     );
-    /**
-     * Construit un nouveau service de gestion des fonctionnalités TONIC.
-     *
-     * @param tonicService Le service de génération de projets TONIC sous-jacent
-     */
+
     public TonicFeaturesService(TonicProjectGenerationService tonicService) {
         this.tonicService = tonicService;
     }
 
     /**
      * Récupère la liste des fonctionnalités (dépendances) disponibles dans TONIC.
-     * <p>
-     * Cette méthode interroge le service TONIC pour obtenir toutes les dépendances
-     * disponibles et les convertit en une liste de fonctionnalités utilisables.
      *
+     * @param includeContractFeatures Si true, inclut les fonctionnalités de contrat dans la liste
      * @return Liste des identifiants de fonctionnalités disponibles
-     * @throws ServiceException avec CommonProblemType.ERREUR_INATTENDUE en cas d'erreur
-     *         lors de la récupération des dépendances ou si la réponse est invalide
+     * @throws ServiceException en cas d'erreur lors de la récupération des dépendances
      */
-    public List<String> getAvailableFeatures() {
+    public List<String> getAvailableFeatures(boolean includeContractFeatures) {
         try {
             ResponseEntity<TonicDependenciesResponse> response = tonicService.getDependencies(null);
 
@@ -67,9 +54,15 @@ public class TonicFeaturesService {
                 return new ArrayList<>();
             }
 
-            return dependencies.getDependencies().keySet().stream()
-                    .filter(feature -> !CONTRACT_FEATURES.contains(feature))
-                    .collect(Collectors.toCollection(ArrayList::new));
+            Set<String> features = new HashSet<>(dependencies.getDependencies().keySet());
+
+            if (includeContractFeatures) {
+                features.addAll(CONTRACT_FEATURES);
+            } else {
+                CONTRACT_FEATURES.forEach(features::remove);
+            }
+
+            return new ArrayList<>(features);
 
         } catch (ServiceException e) {
             throw e;
@@ -81,5 +74,13 @@ public class TonicFeaturesService {
                     "Unexpected error while fetching TONIC features"
             );
         }
+    }
+
+    /**
+     * Version surchargée qui garde la compatibilité avec l'ancien code.
+     * Par défaut, n'inclut pas les fonctionnalités de contrat.
+     */
+    public List<String> getAvailableFeatures() {
+        return getAvailableFeatures(false);
     }
 }
