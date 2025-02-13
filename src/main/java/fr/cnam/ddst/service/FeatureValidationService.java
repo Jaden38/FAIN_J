@@ -16,7 +16,8 @@ import java.util.Map;
  * Service de validation des fonctionnalités demandées pour les instanciateurs.
  * <p>
  * Ce service vérifie que les fonctionnalités demandées lors de la création d'un projet
- * sont valides et disponibles pour le type d'instanciateur spécifié.
+ * sont valides et disponibles pour le type d'instanciateur spécifié. Il gère également
+ * la validation des fonctionnalités de contrat qui ne sont autorisées que dans certains contextes.
  */
 @Slf4j
 @Service
@@ -25,7 +26,7 @@ public class FeatureValidationService {
     private final TonicFeaturesService tonicFeaturesService;
 
     /**
-     * Construit un nouveau service de validation avec les propriétés d'initialisation spécifiées.
+     * Construit un nouveau service de validation.
      *
      * @param tonicFeaturesService Service de gestion des fonctionnalités TONIC
      */
@@ -36,11 +37,11 @@ public class FeatureValidationService {
     /**
      * Valide une liste de fonctionnalités pour un type d'instanciateur donné.
      *
-     * @param type Le type d'instanciateur
+     * @param type Le type d'instanciateur à valider
      * @param requestedFeatures La liste des fonctionnalités à valider
      * @param allowContractFeatures Si true, permet la validation des fonctionnalités de contrat
      * @return La liste des fonctionnalités validées
-     * @throws ClientException si les fonctionnalités sont invalides
+     * @throws ClientException si le type est invalide ou si des fonctionnalités ne sont pas disponibles
      */
     public List<String> validateFeatures(StarterKitType type, List<String> requestedFeatures, boolean allowContractFeatures) {
         if (type == null) {
@@ -108,13 +109,5 @@ public class FeatureValidationService {
         log.info("Successfully validated {} features for type {}", requestedFeatures.size(), type);
         log.debug("Validated features: {}", requestedFeatures);
         return requestedFeatures;
-    }
-
-    /**
-     * Version surchargée qui garde la compatibilité avec l'ancien code.
-     * Par défaut, n'autorise pas les fonctionnalités de contrat.
-     */
-    public List<String> validateFeatures(StarterKitType type, List<String> requestedFeatures) {
-        return validateFeatures(type, requestedFeatures, false);
     }
 }

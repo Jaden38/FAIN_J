@@ -16,21 +16,30 @@ public class TonicFeaturesService {
 
     private final TonicProjectGenerationService tonicService;
 
+    /**
+     * Liste des fonctionnalités de contrat supportées.
+     */
     private static final List<String> CONTRACT_FEATURES = Arrays.asList(
             "toni-contract-openapi",
             "toni-contract-avro"
     );
 
+    /**
+     * Construit un nouveau service de gestion des fonctionnalités TONIC.
+     *
+     * @param tonicService Service de génération de projets TONIC
+     */
     public TonicFeaturesService(TonicProjectGenerationService tonicService) {
         this.tonicService = tonicService;
     }
 
     /**
-     * Récupère la liste des fonctionnalités (dépendances) disponibles dans TONIC.
+     * Récupère la liste des fonctionnalités disponibles dans TONIC.
      *
      * @param includeContractFeatures Si true, inclut les fonctionnalités de contrat dans la liste
-     * @return Liste des identifiants de fonctionnalités disponibles
-     * @throws ServiceException en cas d'erreur lors de la récupération des dépendances
+     * @return Liste des fonctionnalités disponibles
+     * @throws ServiceException en cas d'erreur lors de la récupération des dépendances ou
+     *         si la réponse du service est invalide
      */
     public List<String> getAvailableFeatures(boolean includeContractFeatures) {
         try {
@@ -77,8 +86,10 @@ public class TonicFeaturesService {
     }
 
     /**
-     * Version surchargée qui garde la compatibilité avec l'ancien code.
-     * Par défaut, n'inclut pas les fonctionnalités de contrat.
+     * Récupère la liste des fonctionnalités disponibles, sans les fonctionnalités de contrat.
+     *
+     * @return Liste des fonctionnalités disponibles, hors contrats
+     * @throws ServiceException en cas d'erreur lors de la récupération
      */
     public List<String> getAvailableFeatures() {
         return getAvailableFeatures(false);

@@ -17,8 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 /**
- * Implémentation de l'API qui gère les requêtes REST pour la génération de projets
- * et la récupération des fonctionnalités disponibles.
+ * Contrôleur REST pour la génération de projets et la gestion des fonctionnalités.
+ * <p>
+ * Fournit des endpoints pour:
+ * - La génération de projets starter kit
+ * - La génération de contrats (OPENAPI, AVRO)
+ * - La génération de bibliothèques
+ * - La récupération des types et fonctionnalités disponibles
  */
 @Slf4j
 @RestController
@@ -28,6 +33,13 @@ public class ProjectGenerationController implements DefaultApi {
     private final FeatureValidationService validationService;
     private final TonicFeaturesService tonicFeaturesService;
 
+    /**
+     * Construit un nouveau contrôleur avec les services requis.
+     *
+     * @param tonicProjectGenerationService Service de génération de projets TONIC
+     * @param validationService Service de validation des fonctionnalités
+     * @param tonicFeaturesService Service de gestion des fonctionnalités TONIC
+     */
     public ProjectGenerationController(
             TonicProjectGenerationService tonicProjectGenerationService,
             FeatureValidationService validationService,
@@ -167,6 +179,19 @@ public class ProjectGenerationController implements DefaultApi {
         );
     }
 
+    /**
+     * Méthode interne de génération de projets.
+     *
+     * @param starterKitType Type de starter kit
+     * @param componentName Nom du composant
+     * @param groupId GroupId Maven
+     * @param artifactId ArtifactId Maven
+     * @param features Liste des fonctionnalités
+     * @param validateContractFeatures Si true, vérifie que les fonctionnalités de contrat ne sont pas présentes
+     * @return Archive ZIP contenant le projet généré
+     * @throws ClientException si les paramètres sont invalides
+     * @throws ServiceException en cas d'erreur de génération
+     */
     private ResponseEntity<Resource> internalInstanciateStarterKit(
             StarterKitType starterKitType,
             String componentName,
