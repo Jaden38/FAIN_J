@@ -1,12 +1,15 @@
 package fr.cnam.ddst.service;
 
-import fr.cnam.ddst.config.InitializerProperties;
-import lombok.Getter;
+import fr.cnam.ddst.service.tonic.TonicFeaturesService;
+import fr.cnam.toni.starter.core.exceptions.ClientException;
+import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * Service de validation des fonctionnalités demandées pour les instanciateurs.
@@ -14,18 +17,19 @@ import java.util.stream.Collectors;
  * Ce service vérifie que les fonctionnalités demandées lors de la création d'un projet
  * sont valides et disponibles pour le type d'instanciateur spécifié.
  */
+@Slf4j
 @Service
 public class FeatureValidationService {
 
-    private final InitializerProperties properties;
+    private final TonicFeaturesService tonicFeaturesService;
 
     /**
      * Construit un nouveau service de validation avec les propriétés d'initialisation spécifiées.
      *
-     * @param properties Les propriétés de configuration des instanciateurs
+     * @param tonicFeaturesService Service de gestion des fonctionnalités TONIC
      */
-    public FeatureValidationService(InitializerProperties properties) {
-        this.properties = properties;
+    public FeatureValidationService(TonicFeaturesService tonicFeaturesService) {
+        this.tonicFeaturesService = tonicFeaturesService;
     }
 
     /**
@@ -33,17 +37,43 @@ public class FeatureValidationService {
      *
      * @param type Le type d'instanciateur (TONIC, STUMP, HUMAN)
      * @param requestedFeatures La liste des fonctionnalités à valider
-     * @return Un objet ValidationResult contenant le résultat de la validation
+     * @return La liste des fonctionnalités validées si toutes sont valides
+     * @throws ClientException avec CommonProblemType.DONNEES_INVALIDES si :
+     *         - Le type de composant est null
+     *         - Le type de composant n'est pas supporté
+     *         - Aucune fonctionnalité n'est disponible pour ce type
+     *         - Une ou plusieurs fonctionnalités demandées ne sont pas disponibles
      */
-    public ValidationResult validateFeatures(String type, List<String> requestedFeatures) {
-        if (requestedFeatures == null || requestedFeatures.isEmpty()) {
-            return ValidationResult.valid(Collections.emptyList());
+    public List<String> validateFeatures(String type, List<String> requestedFeatures) {
+        if (type == null) {
+            log.warn("Component type cannot be null");
+            throw new ClientException(
+                    CommonProblemType.DONNEES_INVALIDES,
+                    "Component type cannot be null"
+            );
         }
 
-        List<String> availableFeatures = properties.getFeaturesForType(type);
-        if (availableFeatures == null) {
-            return ValidationResult.invalid(
-                    List.of("Component type " + type + " is not supported")
+        String normalizedType = type.toLowerCase();
+
+        if (!normalizedType.equals("tonic")) {
+            log.warn("Invalid component type: {}. Supported type is: tonic", type);
+            throw new ClientException(
+                    CommonProblemType.DONNEES_INVALIDES,
+                    "Invalid component type: " + type + ". Supported type is: tonic"
+            );
+        }
+
+        if (requestedFeatures == null || requestedFeatures.isEmpty()) {
+            log.info("No features requested for type: {}, returning empty list", type);
+            return Collections.emptyList();
+        }
+
+        List<String> availableFeatures = tonicFeaturesService.getAvailableFeatures();
+        if (availableFeatures == null || availableFeatures.isEmpty()) {
+            log.warn("No features available for component type: {}", type);
+            throw new ClientException(
+                    CommonProblemType.DONNEES_INVALIDES,
+                    "No features available for component type: " + type
             );
         }
 
@@ -52,56 +82,22 @@ public class FeatureValidationService {
                 .toList();
 
         if (!invalidFeatures.isEmpty()) {
-            return ValidationResult.invalid(
-                    invalidFeatures.stream()
-                            .map(feature -> "Feature '" + feature + "' is not available")
-                            .collect(Collectors.toList())
+            log.warn("Invalid features requested for type {}: {}", type, invalidFeatures);
+            log.debug("Available features are: {}", availableFeatures);
+
+            Map<String, Object> details = new HashMap<>();
+            details.put("invalidFeatures", invalidFeatures);
+            details.put("availableFeatures", availableFeatures);
+
+            throw new ClientException(
+                    CommonProblemType.DONNEES_INVALIDES,
+                    "One or more requested features are not available",
+                    details
             );
         }
 
-        return ValidationResult.valid(requestedFeatures);
-    }
-
-    /**
-     * Classe interne représentant le résultat d'une validation de fonctionnalités.
-     */
-    @Getter
-    public static class ValidationResult {
-        private final boolean valid;
-        private final List<String> errors;
-        private final List<String> validatedFeatures;
-
-        /**
-         * Construit un nouveau résultat de validation.
-         *
-         * @param valid Indique si la validation est réussie
-         * @param errors Liste des erreurs de validation
-         * @param validatedFeatures Liste des fonctionnalités validées
-         */
-        private ValidationResult(boolean valid, List<String> errors, List<String> validatedFeatures) {
-            this.valid = valid;
-            this.errors = errors;
-            this.validatedFeatures = validatedFeatures;
-        }
-
-        /**
-         * Crée un résultat de validation réussi.
-         *
-         * @param validatedFeatures Liste des fonctionnalités validées
-         * @return Un nouveau ValidationResult pour une validation réussie
-         */
-        public static ValidationResult valid(List<String> validatedFeatures) {
-            return new ValidationResult(true, Collections.emptyList(), validatedFeatures);
-        }
-
-        /**
-         * Crée un résultat de validation échoué.
-         *
-         * @param errors Liste des erreurs de validation
-         * @return Un nouveau ValidationResult pour une validation échouée
-         */
-        public static ValidationResult invalid(List<String> errors) {
-            return new ValidationResult(false, errors, Collections.emptyList());
-        }
+        log.info("Successfully validated {} features for type {}", requestedFeatures.size(), type);
+        log.debug("Validated features: {}", requestedFeatures);
+        return requestedFeatures;
     }
 }

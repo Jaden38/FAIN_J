@@ -4,8 +4,6 @@ info:
   description: |
     Service facade pour les instanciateurs de starter kits DDST
   version: 0.0.1-SNAPSHOT
-tags:
-  - name: v1
 components:
   schemas:
     Features:
@@ -13,10 +11,8 @@ components:
       items:
         type: string
 paths:
-  /v1/instanciate:
+  /instanciate:
     get:
-      tags:
-        - v1
       summary: Créer une instance du type demandé
       description: Créer une instance du type demandé, avec les fonctionnalités requises
       operationId: getSourceZip
@@ -76,10 +72,8 @@ paths:
         '400':
           description: Valeur de statut invalide
 
-  /v1/features:
+  /features:
     get:
-      tags:
-        - v1
       summary: Obtenir les fonctionnalités disponibles
       description: Récupère la liste des fonctionnalités pour le type de composant spécifié
       operationId: getFeatures
