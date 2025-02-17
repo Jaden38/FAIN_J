@@ -1,11 +1,11 @@
-package fr.cnam.ddst.controller.rest.api;
+package fr.cnam.initializr.facade.controller.rest.api;
 
-import fr.cnam.ddst.controller.rest.model.ContractType;
-import fr.cnam.ddst.controller.rest.model.LibraryType;
-import fr.cnam.ddst.controller.rest.model.StarterKitType;
-import fr.cnam.ddst.service.FeatureValidationService;
-import fr.cnam.ddst.service.tonic.TonicFeaturesService;
-import fr.cnam.ddst.service.tonic.TonicProjectGenerationService;
+import fr.cnam.initializr.facade.controller.rest.model.ContractType;
+import fr.cnam.initializr.facade.controller.rest.model.LibraryType;
+import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
+import fr.cnam.initializr.facade.service.FeatureValidationService;
+import fr.cnam.initializr.facade.service.tonic.TonicFeaturesService;
+import fr.cnam.initializr.facade.service.tonic.TonicProjectGenerationService;
 import fr.cnam.toni.starter.core.exceptions.ClientException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;

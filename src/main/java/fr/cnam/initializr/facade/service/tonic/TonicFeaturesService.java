@@ -1,6 +1,6 @@
-package fr.cnam.ddst.service.tonic;
+package fr.cnam.initializr.facade.service.tonic;
 
-import fr.cnam.ddst.client.tonic.controller.rest.model.TonicDependenciesResponse;
+import fr.cnam.initializr.facade.client.tonic.controller.rest.model.TonicDependenciesResponse;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;

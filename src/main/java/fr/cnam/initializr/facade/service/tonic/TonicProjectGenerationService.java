@@ -1,8 +1,8 @@
-package fr.cnam.ddst.service.tonic;
+package fr.cnam.initializr.facade.service.tonic;
 
-import fr.cnam.ddst.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
-import fr.cnam.ddst.client.tonic.controller.rest.model.TonicDependenciesResponse;
-import fr.cnam.ddst.config.InitializerProperties;
+import fr.cnam.initializr.facade.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
+import fr.cnam.initializr.facade.client.tonic.controller.rest.model.TonicDependenciesResponse;
+import fr.cnam.initializr.facade.config.InitializerConfig;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
      * @param properties Les propriétés de configuration contenant l'URL du service TONIC
      * @throws ServiceException si l'URL du service TONIC n'est pas configurée correctement
      */
-    public TonicProjectGenerationService(InitializerProperties properties) {
+    public TonicProjectGenerationService(InitializerConfig properties) {
         String tonicInitializrUrl = properties.getTonicUrl();
         this.webClient = WebClient.builder()
                 .baseUrl(tonicInitializrUrl)

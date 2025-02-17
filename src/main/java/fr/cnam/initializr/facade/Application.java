@@ -1,9 +1,7 @@
-package fr.cnam.ddst;
+package fr.cnam.initializr.facade;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGenerator;
 
 /**
  * Classe principale de l'application Spring Boot.

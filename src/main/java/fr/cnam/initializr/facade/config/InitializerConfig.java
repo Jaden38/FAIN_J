@@ -1,4 +1,4 @@
-package fr.cnam.ddst.config;
+package fr.cnam.initializr.facade.config;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,10 +1,13 @@
 initializer:
   tonic:
     url: ${TONIC_URL}
+    default:
+      group-id: com.example
+      artifact-id: tonic
 
-springdoc:
-  api-docs:
-    version: openapi_3_0
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
+openapi:
+  # chemin d'accès du contrat OpenAPI
+  # utilisé par le controller custom SpringDoc pour fournir à swagger-ui
+  # le document OpenAPI original, et pas un document regénéré à partir du code
+  # (fonctionnement par défaut)
+  contract.location: "classpath:openapi-facade.yml"

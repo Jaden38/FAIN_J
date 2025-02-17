@@ -10,7 +10,7 @@
         <version>1.3.0</version>
     </parent>
 
-    <groupId>fr.cnam.ddst</groupId>
+    <groupId>fr.cnam.initializr.facade</groupId>
     <artifactId>fainj</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
@@ -46,9 +46,9 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/openapi-facade.yml</inputSpec>
                             <generatorName>spring</generatorName>
-                            <apiPackage>fr.cnam.ddst.controller.rest.api</apiPackage>
-                            <modelPackage>fr.cnam.ddst.controller.rest.model</modelPackage>
-                            <invokerPackage>fr.cnam.ddst.controller.rest.invoker</invokerPackage>
+                            <apiPackage>fr.cnam.initializr.facade.controller.rest.api</apiPackage>
+                            <modelPackage>fr.cnam.initializr.facade.controller.rest.model</modelPackage>
+                            <invokerPackage>fr.cnam.initializr.facade.controller.rest.invoker</invokerPackage>
                             <languageSpecificPrimitives>
                                 <languageSpecificPrimitive>Problem</languageSpecificPrimitive>
                                 <languageSpecificPrimitive>ProblemResponse</languageSpecificPrimitive>
@@ -83,9 +83,9 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/openapi-tcinj.yaml</inputSpec>
                             <generatorName>spring</generatorName>
-                            <apiPackage>fr.cnam.ddst.client.tonic.controller.rest.api</apiPackage>
-                            <modelPackage>fr.cnam.ddst.client.tonic.controller.rest.model</modelPackage>
-                            <invokerPackage>fr.cnam.ddst.client.tonic.controller.rest.invoker</invokerPackage>
+                            <apiPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.api</apiPackage>
+                            <modelPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.model</modelPackage>
+                            <invokerPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.invoker</invokerPackage>
                             <languageSpecificPrimitives>
                                 <languageSpecificPrimitive>Problem</languageSpecificPrimitive>
                                 <languageSpecificPrimitive>ProblemResponse</languageSpecificPrimitive>
