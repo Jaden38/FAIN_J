@@ -1,9 +1,7 @@
 initializer:
   tonic:
     url: ${TONIC_URL}
-    default:
-      group-id: com.example
-      artifact-id: tonic
+    group-id: fr.cnam
 
 openapi:
   # chemin d'accès du contrat OpenAPI

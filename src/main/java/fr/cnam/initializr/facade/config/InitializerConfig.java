@@ -37,5 +37,13 @@ public class InitializerConfig {
         return (String) tonic.get("url");
     }
 
+    /**
+     * Récupère l'identifiant du groupe par défaut pour l'instanciateur TONIC.
+     *
+     * @return L'identifiant du groupe par défaut pour l'instanciateur TONIC
+     */
+    public String getTonicDefaultGroupId() {
+        return (String) tonic.get("group-id");
+    }
 
 }
