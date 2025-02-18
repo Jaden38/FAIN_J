@@ -47,7 +47,7 @@ public class FeatureValidationService {
         if (type == null) {
             log.warn("Component type cannot be null");
             throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES,
+                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
                     "Component type cannot be null"
             );
         }
@@ -55,7 +55,7 @@ public class FeatureValidationService {
         if (type != StarterKitType.TONIC) {
             log.warn("Invalid component type: {}. Only TONIC is currently supported", type);
             throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES,
+                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
                     "Invalid component type: " + type + ". Only TONIC is currently supported"
             );
         }
@@ -72,7 +72,7 @@ public class FeatureValidationService {
             if (hasContractFeatures) {
                 log.warn("Contract features detected when not allowed: {}", requestedFeatures);
                 throw new ClientException(
-                        CommonProblemType.DONNEES_INVALIDES,
+                        CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
                         "Contract features are not allowed in this context"
                 );
             }
@@ -82,7 +82,7 @@ public class FeatureValidationService {
         if (availableFeatures == null || availableFeatures.isEmpty()) {
             log.warn("No features available for component type: {}", type);
             throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES,
+                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
                     "No features available for component type: " + type
             );
         }
@@ -100,9 +100,8 @@ public class FeatureValidationService {
             details.put("availableFeatures", availableFeatures);
 
             throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES,
-                    "One or more requested features are not available",
-                    details
+                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
+                    details.toString()
             );
         }
 

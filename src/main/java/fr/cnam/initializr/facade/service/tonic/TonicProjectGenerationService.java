@@ -127,17 +127,14 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
                     .timeout(TIMEOUT)
                     .onErrorMap(TimeoutException.class, ex ->
                             new ServiceException(
-                                    CommonProblemType.ERREUR_INATTENDUE,
-                                    ex,
-                                    "Timeout while generating project"
+                                    CommonProblemType.ERREUR_INATTENDUE
                             )
                     )
                     .block();
 
             if (projectZip == null) {
                 throw new ServiceException(
-                        CommonProblemType.ERREUR_INATTENDUE,
-                        "Failed to generate project: Empty response from Tonic initializer"
+                        CommonProblemType.ERREUR_INATTENDUE
                 );
             }
 
@@ -145,22 +142,13 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
 
         } catch (WebClientResponseException e) {
             log.error("Error response from Tonic initializer: {}", e.getMessage());
-            Map<String, Object> details = new HashMap<>();
-            details.put("status", e.getStatusCode().value());
-            details.put("response", e.getResponseBodyAsString());
-
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Failed to generate project from Tonic initializer",
-                    details
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         } catch (Exception e) {
             log.error("Failed to generate project", e);
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Unexpected error while generating project"
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         }
     }
@@ -189,8 +177,7 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
 
             if (dependencies == null) {
                 throw new ServiceException(
-                        CommonProblemType.ERREUR_INATTENDUE,
-                        "Failed to fetch dependencies: Empty response from Tonic initializer"
+                        CommonProblemType.ERREUR_INATTENDUE
                 );
             }
 
@@ -198,22 +185,13 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
 
         } catch (WebClientResponseException e) {
             log.error("Error fetching dependencies from Tonic initializer: {}", e.getMessage());
-            Map<String, Object> details = new HashMap<>();
-            details.put("status", e.getStatusCode().value());
-            details.put("response", e.getResponseBodyAsString());
-
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Failed to fetch dependencies from Tonic initializer",
-                    details
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         } catch (Exception e) {
             log.error("Failed to fetch dependencies", e);
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Unexpected error while fetching dependencies"
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         }
     }

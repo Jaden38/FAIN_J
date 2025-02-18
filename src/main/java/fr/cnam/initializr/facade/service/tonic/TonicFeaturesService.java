@@ -52,13 +52,8 @@ public class TonicFeaturesService {
             ResponseEntity<TonicDependenciesResponse> response = tonicService.getDependencies(null);
 
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                Map<String, Object> details = new HashMap<>();
-                details.put("statusCode", response.getStatusCode().value());
-
                 throw new ServiceException(
-                        CommonProblemType.ERREUR_INATTENDUE,
-                        "Failed to get dependencies from TONIC service",
-                        details
+                        CommonProblemType.ERREUR_INATTENDUE
                 );
             }
 
@@ -81,9 +76,7 @@ public class TonicFeaturesService {
         } catch (Exception e) {
             log.error("Error while fetching TONIC features", e);
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Unexpected error while fetching TONIC features"
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         }
     }
