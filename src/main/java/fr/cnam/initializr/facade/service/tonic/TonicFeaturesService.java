@@ -42,7 +42,7 @@ public class TonicFeaturesService {
      *
      * @return Liste des fonctionnalités disponibles
      * @throws ServiceException en cas d'erreur lors de la récupération des dépendances ou
-     *         si la réponse du service est invalide
+     *                          si la réponse du service est invalide
      */
     @Cacheable(value = "tonicFeatures")
     public List<String> getAvailableFeatures() {

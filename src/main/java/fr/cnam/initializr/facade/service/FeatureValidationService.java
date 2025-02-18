@@ -37,8 +37,8 @@ public class FeatureValidationService {
     /**
      * Valide une liste de fonctionnalités pour un type d'instanciateur donné.
      *
-     * @param type Le type d'instanciateur à valider
-     * @param requestedFeatures La liste des fonctionnalités à valider
+     * @param type                  Le type d'instanciateur à valider
+     * @param requestedFeatures     La liste des fonctionnalités à valider
      * @param allowContractFeatures Si true, permet la validation des fonctionnalités de contrat
      * @return La liste des fonctionnalités validées
      * @throws ClientException si le type est invalide ou si des fonctionnalités ne sont pas disponibles

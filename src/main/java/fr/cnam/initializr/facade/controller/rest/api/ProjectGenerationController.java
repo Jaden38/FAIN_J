@@ -12,11 +12,14 @@ import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Contrôleur REST pour la génération de projets et la gestion des composants.
@@ -44,9 +47,9 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      * Construit un nouveau contrôleur de génération de projets.
      *
      * @param tonicProjectGenerationService Service de génération de projets TONIC
-     * @param validationService Service de validation des fonctionnalités
-     * @param tonicFeaturesService Service de gestion des fonctionnalités TONIC
-     * @param initializerConfig Configuration de l'initialisateur
+     * @param validationService             Service de validation des fonctionnalités
+     * @param tonicFeaturesService          Service de gestion des fonctionnalités TONIC
+     * @param initializerConfig             Configuration de l'initialisateur
      */
     public ProjectGenerationController(
             TonicProjectGenerationService tonicProjectGenerationService,
@@ -94,9 +97,9 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
     /**
      * Génère un projet à partir d'un starter kit avec les fonctionnalités spécifiées.
      *
-     * @param starterKit Le type de starter kit à utiliser
+     * @param starterKit     Le type de starter kit à utiliser
      * @param codeApplicatif Le code applicatif du projet
-     * @param features Liste des fonctionnalités à inclure
+     * @param features       Liste des fonctionnalités à inclure
      * @return ResponseEntity contenant l'archive du projet généré
      */
     @Override
@@ -126,8 +129,8 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
     /**
      * Crée un contrat pour un projet donné.
      *
-     * @param starterKit Le type de starter kit
-     * @param contractType Le type de contrat à générer
+     * @param starterKit     Le type de starter kit
+     * @param contractType   Le type de contrat à générer
      * @param codeApplicatif Le code applicatif du projet
      * @return ResponseEntity contenant l'archive du contrat généré
      * @throws ServiceException si la génération échoue
@@ -169,7 +172,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      * Crée une nouvelle bibliothèque.
      * Cette fonctionnalité n'est pas encore implémentée.
      *
-     * @param starterKit Le type de starter kit
+     * @param starterKit     Le type de starter kit
      * @param codeApplicatif Le code applicatif de la bibliothèque
      * @return ResponseEntity contenant l'archive de la bibliothèque générée
      * @throws ServiceException car la fonctionnalité n'est pas implémentée
@@ -188,12 +191,12 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      * Cette méthode gère la logique commune de génération de projets pour les
      * différents types de requêtes (projet standard, contrat, bibliothèque).
      *
-     * @param starterKitType Le type de starter kit
-     * @param codeApplicatif Le code applicatif du projet
-     * @param features Liste des fonctionnalités à inclure
+     * @param starterKitType           Le type de starter kit
+     * @param codeApplicatif           Le code applicatif du projet
+     * @param features                 Liste des fonctionnalités à inclure
      * @param validateContractFeatures Si true, vérifie que les fonctionnalités de contrat ne sont pas incluses
      * @return ResponseEntity contenant l'archive du projet généré
-     * @throws ClientException si les paramètres sont invalides
+     * @throws ClientException  si les paramètres sont invalides
      * @throws ServiceException si la génération échoue
      */
     private ResponseEntity<Resource> internalInstanciateStarterKit(
