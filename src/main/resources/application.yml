@@ -3,5 +3,9 @@ initializer:
     url: ${TONIC_URL}
     group-id: fr.cnam
 
+cache:
+  tonic-features:
+    ttl: 43200000 # 12 hours
+
 openapi:
   contract.location: "classpath:openapi-facade.yml"

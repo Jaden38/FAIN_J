@@ -113,6 +113,45 @@
                             <generateModelTests>false</generateModelTests>
                         </configuration>
                     </execution>
+                    <!-- Generate Metric Client API -->
+                    <execution>
+                        <id>generate-metric-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi-metric-initializr-1.0.0.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>fr.cnam.initializr.facade.client.metric.controller.rest.api</apiPackage>
+                            <modelPackage>fr.cnam.initializr.facade.client.metric.controller.rest.model</modelPackage>
+                            <invokerPackage>fr.cnam.initializr.facade.client.metric.controller.rest.invoker</invokerPackage>
+                            <languageSpecificPrimitives>
+                                <languageSpecificPrimitive>Problem</languageSpecificPrimitive>
+                                <languageSpecificPrimitive>ProblemResponse</languageSpecificPrimitive>
+                            </languageSpecificPrimitives>
+                            <importMappings>
+                                <importMapping>
+                                    ProblemResponse=fr.cnam.toni.starter.web.core.rest.responses.ProblemResponse
+                                </importMapping>
+                                <importMapping>Problem=fr.cnam.toni.starter.web.core.rest.responses.Problem
+                                </importMapping>
+                            </importMappings>
+                            <schemaMappings>
+                                ProblemResponse=fr.cnam.toni.starter.web.core.rest.responses.ProblemResponse,Problem=fr.cnam.toni.starter.web.core.rest.responses.Problem
+                            </schemaMappings>
+                            <configOptions>
+                                <sourceFolder>src/gen/java</sourceFolder>
+                                <delegatePattern>true</delegatePattern>
+                                <openApiNullable>false</openApiNullable>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <requestMappingMode>api_interface</requestMappingMode>
+                                <useTags>true</useTags>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
