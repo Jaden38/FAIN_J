@@ -4,20 +4,23 @@ import fr.cnam.initializr.facade.client.tonic.controller.rest.model.TonicDepende
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@EnableCaching
 public class TonicFeaturesService {
 
     private final TonicProjectGenerationService tonicService;
 
     /**
      * Liste des fonctionnalités de contrat supportées.
+     * Note: Ces fonctionnalités ne sont jamais incluses dans les résultats.
      */
     private static final List<String> CONTRACT_FEATURES = Arrays.asList(
             "toni-contract-openapi",
@@ -34,15 +37,18 @@ public class TonicFeaturesService {
     }
 
     /**
-     * Récupère la liste des fonctionnalités disponibles dans TONIC.
+     * Récupère la liste des fonctionnalités disponibles dans TONIC, sans les fonctionnalités de contrat.
+     * Les résultats sont mis en cache pour éviter des appels répétés au service.
      *
-     * @param includeContractFeatures Si true, inclut les fonctionnalités de contrat dans la liste
      * @return Liste des fonctionnalités disponibles
      * @throws ServiceException en cas d'erreur lors de la récupération des dépendances ou
      *         si la réponse du service est invalide
      */
-    public List<String> getAvailableFeatures(boolean includeContractFeatures) {
+    @Cacheable(value = "tonicFeatures")
+    public List<String> getAvailableFeatures() {
         try {
+            log.debug("Cache miss - fetching features from TONIC service");
+
             ResponseEntity<TonicDependenciesResponse> response = tonicService.getDependencies(null);
 
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
@@ -64,14 +70,11 @@ public class TonicFeaturesService {
             }
 
             Set<String> features = new HashSet<>(dependencies.getDependencies().keySet());
+            CONTRACT_FEATURES.forEach(features::remove);
 
-            if (includeContractFeatures) {
-                features.addAll(CONTRACT_FEATURES);
-            } else {
-                CONTRACT_FEATURES.forEach(features::remove);
-            }
-
-            return new ArrayList<>(features);
+            List<String> result = new ArrayList<>(features);
+            log.debug("Retrieved {} features from TONIC service", result.size());
+            return result;
 
         } catch (ServiceException e) {
             throw e;
@@ -83,15 +86,5 @@ public class TonicFeaturesService {
                     "Unexpected error while fetching TONIC features"
             );
         }
-    }
-
-    /**
-     * Récupère la liste des fonctionnalités disponibles, sans les fonctionnalités de contrat.
-     *
-     * @return Liste des fonctionnalités disponibles, hors contrats
-     * @throws ServiceException en cas d'erreur lors de la récupération
-     */
-    public List<String> getAvailableFeatures() {
-        return getAvailableFeatures(false);
     }
 }

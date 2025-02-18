@@ -78,7 +78,7 @@ public class FeatureValidationService {
             }
         }
 
-        List<String> availableFeatures = tonicFeaturesService.getAvailableFeatures(allowContractFeatures);
+        List<String> availableFeatures = tonicFeaturesService.getAvailableFeatures();
         if (availableFeatures == null || availableFeatures.isEmpty()) {
             log.warn("No features available for component type: {}", type);
             throw new ClientException(
