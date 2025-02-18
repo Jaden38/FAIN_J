@@ -4,8 +4,4 @@ initializer:
     group-id: fr.cnam
 
 openapi:
-  # chemin d'accès du contrat OpenAPI
-  # utilisé par le controller custom SpringDoc pour fournir à swagger-ui
-  # le document OpenAPI original, et pas un document regénéré à partir du code
-  # (fonctionnement par défaut)
   contract.location: "classpath:openapi-facade.yml"
