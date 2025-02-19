@@ -22,7 +22,7 @@ public class TonicFeaturesService {
      * Liste des fonctionnalités de contrat supportées.
      * Note: Ces fonctionnalités ne sont jamais incluses dans les résultats.
      */
-    private static final List<String> CONTRACT_FEATURES = Arrays.asList(
+    public static final List<String> CONTRACT_FEATURES = Arrays.asList(
             "toni-contract-openapi",
             "toni-contract-avro"
     );
