@@ -7,10 +7,9 @@ import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static fr.cnam.initializr.facade.service.tonic.TonicFeaturesService.CONTRACT_FEATURES;
 
 /**
  * Service de validation des fonctionnalités demandées pour les instanciateurs.
@@ -78,8 +77,13 @@ public class FeatureValidationService {
             }
         }
 
-        List<String> availableFeatures = tonicFeaturesService.getAvailableFeatures();
-        if (availableFeatures == null || availableFeatures.isEmpty()) {
+        List<String> availableFeatures = new ArrayList<>(tonicFeaturesService.getAvailableFeatures());
+
+        if (allowContractFeatures) {
+            availableFeatures.addAll(CONTRACT_FEATURES);
+        }
+
+        if (availableFeatures.isEmpty()) {
             log.warn("No features available for component type: {}", type);
             throw new ClientException(
                     CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
