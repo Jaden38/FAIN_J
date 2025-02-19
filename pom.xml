@@ -33,18 +33,39 @@
 
     <build>
         <plugins>
+            <!-- Remote resources plugin to fetch OpenAPI contracts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <configuration>
+                    <resourceBundles>
+                        <resourceBundle>fr.cnam.toni:fainoa:1.0.0-SNAPSHOT</resourceBundle>
+                        <resourceBundle>fr.cnam.toni:tcinoa:1.0.0-SNAPSHOT</resourceBundle>
+                    </resourceBundles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>LoadOpenApi</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <executions>
-                    <!-- Generate Instanciateur Server API -->
+                    <!-- Generate Facade Server API -->
                     <execution>
                         <id>generate-facade-server</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi-facade.yml</inputSpec>
+                            <inputSpec>${project.basedir}/target/maven-shared-archive-resources/openapi-facade.yml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>fr.cnam.initializr.facade.controller.rest.api</apiPackage>
                             <modelPackage>fr.cnam.initializr.facade.controller.rest.model</modelPackage>
@@ -81,7 +102,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi-tcinj.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/target/maven-shared-archive-resources/openapi-tcinj.yml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.api</apiPackage>
                             <modelPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.model</modelPackage>
