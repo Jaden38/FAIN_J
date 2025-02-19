@@ -1,8 +1,8 @@
-package fr.cnam.ddst.service.tonic;
+package fr.cnam.initializr.facade.service.tonic;
 
-import fr.cnam.ddst.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
-import fr.cnam.ddst.client.tonic.controller.rest.model.TonicDependenciesResponse;
-import fr.cnam.ddst.config.InitializerProperties;
+import fr.cnam.initializr.facade.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
+import fr.cnam.initializr.facade.client.tonic.controller.rest.model.TonicDependenciesResponse;
+import fr.cnam.initializr.facade.config.InitializerConfig;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +16,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
@@ -51,7 +49,7 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
      * @param properties Les propriétés de configuration contenant l'URL du service TONIC
      * @throws ServiceException si l'URL du service TONIC n'est pas configurée correctement
      */
-    public TonicProjectGenerationService(InitializerProperties properties) {
+    public TonicProjectGenerationService(InitializerConfig properties) {
         String tonicInitializrUrl = properties.getTonicUrl();
         this.webClient = WebClient.builder()
                 .baseUrl(tonicInitializrUrl)
@@ -127,17 +125,14 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
                     .timeout(TIMEOUT)
                     .onErrorMap(TimeoutException.class, ex ->
                             new ServiceException(
-                                    CommonProblemType.ERREUR_INATTENDUE,
-                                    ex,
-                                    "Timeout while generating project"
+                                    CommonProblemType.ERREUR_INATTENDUE
                             )
                     )
                     .block();
 
             if (projectZip == null) {
                 throw new ServiceException(
-                        CommonProblemType.ERREUR_INATTENDUE,
-                        "Failed to generate project: Empty response from Tonic initializer"
+                        CommonProblemType.ERREUR_INATTENDUE
                 );
             }
 
@@ -145,22 +140,13 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
 
         } catch (WebClientResponseException e) {
             log.error("Error response from Tonic initializer: {}", e.getMessage());
-            Map<String, Object> details = new HashMap<>();
-            details.put("status", e.getStatusCode().value());
-            details.put("response", e.getResponseBodyAsString());
-
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Failed to generate project from Tonic initializer",
-                    details
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         } catch (Exception e) {
             log.error("Failed to generate project", e);
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Unexpected error while generating project"
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         }
     }
@@ -189,8 +175,7 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
 
             if (dependencies == null) {
                 throw new ServiceException(
-                        CommonProblemType.ERREUR_INATTENDUE,
-                        "Failed to fetch dependencies: Empty response from Tonic initializer"
+                        CommonProblemType.ERREUR_INATTENDUE
                 );
             }
 
@@ -198,22 +183,13 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
 
         } catch (WebClientResponseException e) {
             log.error("Error fetching dependencies from Tonic initializer: {}", e.getMessage());
-            Map<String, Object> details = new HashMap<>();
-            details.put("status", e.getStatusCode().value());
-            details.put("response", e.getResponseBodyAsString());
-
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Failed to fetch dependencies from Tonic initializer",
-                    details
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         } catch (Exception e) {
             log.error("Failed to fetch dependencies", e);
             throw new ServiceException(
-                    CommonProblemType.ERREUR_INATTENDUE,
-                    e,
-                    "Unexpected error while fetching dependencies"
+                    CommonProblemType.ERREUR_INATTENDUE
             );
         }
     }

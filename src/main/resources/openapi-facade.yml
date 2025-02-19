@@ -10,31 +10,33 @@ components:
       type: array
       items:
         type: string
-    ComponentType:
+    StarterKitType:
       type: string
       enum:
         - TONIC
         - HUMAN
-      #        - STUMP
-      #        - CONTRAT-OPENAPI
-      #        - CONTRAT-AVRO
-      #        - CONTRAT-SOAP
-      #        - LIB-JAVA
-      #        - LIB-NODE
-      default: TONIC
+        - STUMP
+    ContractType:
+      type: string
+      enum:
+        - OPENAPI
+        - AVRO
+        - SOAP
     ComponentTypes:
       type: array
       items:
-        $ref: '#/components/schemas/ComponentType'
+          $ref: '#/components/schemas/StarterKitType'
 paths:
-  /type-composant:
+  /components/starter-kits:
     get:
-      summary: Obtenir les types de composants disponibles
-      description: Récupère la liste des types de composants supportés par l'API
-      operationId: getComponentTypes
+      tags:
+        - components
+      summary: Lister tous les composants disponibles
+      description: Récupère la liste de tous les composants starter kit supportés
+      operationId: getAllComponents
       responses:
         '200':
-          description: Liste des types de composants disponibles
+          description: Liste de tous les composants disponibles
           content:
             application/json:
               schema:
@@ -42,36 +44,20 @@ paths:
         '500':
           description: Erreur interne du serveur
 
-  /instanciate:
+  /components/{starter-kit}:
     get:
-      summary: Créer une instance du type demandé
-      description: Créer une instance du type demandé, avec les fonctionnalités requises
-      operationId: getSourceZip
+      tags:
+        - components
+      summary: Instancier un composant starter kit
+      description: Créer une instance du starter kit demandé avec les fonctionnalités spécifiées
+      operationId: instantiateStarterKit
       parameters:
-        - name: typeDeComposant
-          in: query
-          description: Kit à instancier
+        - name: starter-kit
+          in: path
+          description: Type de starter kit à instancier
           required: true
           schema:
-            $ref: '#/components/schemas/ComponentType'
-        - name: nomDuComposant
-          in: query
-          description: Nom du composant à générer
-          required: true
-          schema:
-            type: string
-        - name: groupId
-          in: query
-          description: Identifiant de groupe pour le projet Maven
-          required: false
-          schema:
-            type: string
-        - name: artifactId
-          in: query
-          description: Identifiant d'artefact pour le projet Maven
-          required: false
-          schema:
-            type: string
+            $ref: '#/components/schemas/StarterKitType'
         - name: features
           in: query
           description: Fonctionnalités à instancier
@@ -80,35 +66,164 @@ paths:
             $ref: '#/components/schemas/Features'
           style: form
           explode: true
+        - name: code-applicatif
+          in: query
+          description: Code applicatif du composant à générer
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Retourne une archive zip contenant les sources correspondant aux paramètres demandés
+          description: Archive zip contenant les sources générées
           content:
             application/octet-stream:
               schema:
                 type: string
                 format: binary
         '400':
-          description: Valeur de statut invalide
+          description: Paramètres invalides
+        '500':
+          description: Erreur interne du serveur
 
-  /features:
+  /components/{starter-kit}/features:
     get:
-      summary: Obtenir les fonctionnalités disponibles
-      description: Récupère la liste des fonctionnalités pour le type de composant spécifié
-      operationId: getFeatures
+      tags:
+        - components
+      summary: Lister les fonctionnalités d'un composant
+      description: Récupère la liste des fonctionnalités disponibles pour le starter kit spécifié
+      operationId: getComponentFeatures
       parameters:
-        - name: typeDeComposant
-          in: query
-          description: Type de composant (ex. HUMAN, STUMP, TONIC, CONTRAT-OPENAPI, CONTRAT-AVRO, CONTRAT-SOAP, LIB-JAVA, LIB-NODE)
+        - name: starter-kit
+          in: path
+          description: Type de starter kit
           required: true
           schema:
-            $ref: '#/components/schemas/ComponentType'
+            $ref: '#/components/schemas/StarterKitType'
       responses:
         '200':
-          description: Réponse réussie
+          description: Liste des fonctionnalités disponibles
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Features'
         '400':
-          description: Requête invalide
+          description: Type de starter kit invalide
+        '500':
+          description: Erreur interne du serveur
+
+  /contracts/{starter-kit}:
+    get:
+      tags:
+        - contracts
+      summary: Lister les contrats disponibles pour un starter kit
+      description: Récupère la liste des types de contrats supportés par le starter kit spécifié
+      operationId: getAvailableContracts
+      parameters:
+        - name: starter-kit
+          in: path
+          description: Type de starter kit
+          required: true
+          schema:
+            $ref: '#/components/schemas/StarterKitType'
+      responses:
+        '200':
+          description: Liste des contrats disponibles pour le starter kit
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractType'
+        '400':
+          description: Type de starter kit invalide
+        '500':
+          description: Erreur interne du serveur
+
+  /contracts/{starter-kit}/{contract-type}:
+    get:
+      tags:
+        - contracts
+      summary: Créer un contrat pour un starter kit
+      description: Générer une instance de contrat pour le starter kit spécifié
+      operationId: createContract
+      parameters:
+        - name: starter-kit
+          in: path
+          description: Type de starter kit
+          required: true
+          schema:
+            $ref: '#/components/schemas/StarterKitType'
+        - name: contract-type
+          in: path
+          description: Type de contrat à générer
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractType'
+        - name: code-applicatif
+          in: query
+          description: Code applicatif du composant à générer
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Archive zip contenant le contrat généré
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Paramètres invalides ou combinaison starter kit/contrat non supportée
+        '500':
+          description: Erreur interne du serveur
+
+  /libraries/starter-kits:
+    get:
+      tags:
+        - libraries
+      summary: Lister les starter kits disponibles pour les bibliothèques
+      description: Récupère la liste des starter kits supportant la génération de bibliothèques
+      operationId: getAvailableLibraryStarterKits
+      responses:
+        '200':
+          description: Liste des starter kits disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StarterKitType'
+        '500':
+          description: Erreur interne du serveur
+
+  /libraries/{starter-kit}:
+    get:
+      tags:
+        - libraries
+      summary: Créer une bibliothèque pour un starter kit
+      description: Générer une instance de bibliothèque pour le starter kit spécifié
+      operationId: createLibrary
+      parameters:
+        - name: starter-kit
+          in: path
+          description: Type de starter kit
+          required: true
+          schema:
+            $ref: '#/components/schemas/StarterKitType'
+        - name: code-applicatif
+          in: query
+          description: Code applicatif du composant à générer
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Archive zip contenant la bibliothèque générée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Paramètres invalides
+        '500':
+          description: Erreur interne du serveur

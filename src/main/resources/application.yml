@@ -1,10 +1,11 @@
 initializer:
   tonic:
     url: ${TONIC_URL}
+    group-id: fr.cnam
 
-springdoc:
-  api-docs:
-    version: openapi_3_0
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
+cache:
+  tonic-features:
+    ttl: 43200000 # 12 hours
+
+openapi:
+  contract.location: "classpath:openapi-facade.yml"

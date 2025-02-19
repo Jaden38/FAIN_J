@@ -7,9 +7,7 @@ initializer:
 server:
   port: 9000
 
-springdoc:
-  api-docs:
-    version: openapi_3_0
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
+logging:
+  level:
+    org.springframework: info
+    fr.cnam: debug

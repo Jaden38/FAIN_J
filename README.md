@@ -5,114 +5,152 @@
 2. [Architecture](#architecture)
 3. [Points d'accès REST](#points-daccès-rest)
 4. [Guide d'utilisation](#guide-dutilisation)
-   - [Cas de succès](#cas-de-succès)
-   - [Cas d'erreur](#cas-derreur)
-5. [Types de composants disponibles](#types-de-composants-disponibles)
-6. [Features disponibles](#features-disponibles)
-7. [Configuration technique](#configuration-technique)
+5. [Types disponibles](#types-disponibles)
+6. [Configuration technique](#configuration-technique)
 
 ## Aperçu
 
-FAIN_J est une API facade qui uniformise l'accès aux différents instanciateurs de projets DDST. Le service expose une API REST unifiée permettant de générer des projets à partir de différents starter kits tout en conservant les spécificités de chaque type de composant.
+FAIN_J est une API facade qui uniformise l'accès aux différents instanciateurs de projets DDST. Le service expose une API REST unifiée permettant de générer des projets à partir de différents starter kits, contrats et bibliothèques.
 
 ## Architecture
 
 L'architecture se compose de trois diagrammes principaux :
 
 1. **Diagramme de séquence** - Illustre le flux d'interaction entre les composants :
-   ![Diagramme de séquence](/src/main/resources/diagrams/sequence-diagram.png)
+   ![Diagramme de séquence](/doc/diagrams/sequence-diagram.png)
 
 2. **Diagramme de classes** - Montre la structure des classes du système :
-   ![Diagramme de classes](/src/main/resources/diagrams/class-diagram.png)
+   ![Diagramme de classes](/doc/diagrams/class-diagram.png)
 
 3. **Diagramme de composants** - Présente l'architecture globale du système :
-   ![Diagramme de composants](/src/main/resources/diagrams/component-diagram.png)
+   ![Diagramme de composants](/doc/diagrams/component-diagram.png)
 
 ## Points d'accès REST
 
-Le service expose les endpoints suivants sur le port 9000:
+### Composants (Starter Kits)
 
-### GET /type-composant
-Récupère la liste des types de composants disponibles.
+#### GET /components/starter-kits
+Récupère la liste des types de starter kits disponibles.
 
-**Réponse:** Liste des types de composants supportés (TONIC, HUMAN)
+**Réponse:** Liste des types supportés (TONIC, HUMAN, STUMP)
 
-### GET /instanciate
-Génère un nouveau projet à partir des paramètres fournis.
-
-**Paramètres:**
-- `typeDeComposant` (requis): Type du composant à générer (ex: TONIC, HUMAN)
-- `nomDuComposant` (requis): Nom du projet
-- `groupId` (optionnel): GroupId Maven (défaut: fr.cnam.default)
-- `artifactId` (optionnel): ArtifactId Maven (défaut: nomDuComposant)
-- `features` (optionnel): Liste des dépendances séparées par des virgules
-
-### GET /features
-Retourne la liste des features disponibles pour un type de composant.
+#### GET /components/{starter-kit}/features
+Retourne la liste des features disponibles pour un type de starter kit.
 
 **Paramètres:**
-- `typeDeComposant` (requis): Type du composant (ex: TONIC, HUMAN)
+- `starter-kit` (chemin, requis): Type du starter kit (TONIC, HUMAN, STUMP)
+
+#### GET /components/{starter-kit}
+Génère un nouveau projet starter kit.
+
+**Paramètres:**
+- `starter-kit` (chemin, requis): Type du starter kit
+- `code-applicatif` (query, requis): Code applicatif du composant à générer
+- `features` (query, optionnel): Liste des features à inclure
+
+### Contrats
+
+#### GET /contracts/{starter-kit}
+Récupère la liste des types de contrats disponibles pour un starter kit.
+
+**Paramètres:**
+- `starter-kit` (chemin, requis): Type du starter kit
+
+**Réponse:** Liste des types supportés (OPENAPI, AVRO, SOAP)
+
+#### GET /contracts/{starter-kit}/{contract-type}
+Génère un nouveau projet de contrat.
+
+**Paramètres:**
+- `starter-kit` (chemin, requis): Type du starter kit
+- `contract-type` (chemin, requis): Type du contrat
+- `code-applicatif` (query, requis): Code applicatif du composant à générer
+
+### Bibliothèques
+
+#### GET /libraries/starter-kits
+Récupère la liste des types de starter kits disponibles pour les bibliothèques.
+
+**Réponse:** Liste des types supportés
+
+#### GET /libraries/{starter-kit}
+Génère un nouveau projet de bibliothèque.
+
+**Paramètres:**
+- `starter-kit` (chemin, requis): Type du starter kit
+- `code-applicatif` (query, requis): Code applicatif du composant à générer
 
 ## Guide d'utilisation
 
 ### Cas de succès
 
-1. **Dépendance unique**
-```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client
-```
-
-2. **Dépendances multiples**
-```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId&features=toni-starter-security-authapp-v2-client,toni-starter-client-espoir,toni-contract-openapi
+#### 1. Starter Kit TONIC avec une feature
+```http
+http://localhost:9000/components/TONIC?code-applicatif=test-project&features=toni-starter-security-authapp-v2-client
 ```
 
-3. **Sans dépendances**
+#### 2. Starter Kit TONIC avec plusieurs features
+```http
+http://localhost:9000/components/TONIC?code-applicatif=test-project&features=toni-starter-security-authapp-v2-client&features=toni-starter-client-espoir
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&groupId=fr.cnam.myGroupId&artifactId=myArtefactId
+
+#### 3. Lister les features disponibles pour TONIC
+```http
+http://localhost:9000/components/TONIC/features
+```
+
+#### 4. Créer un contrat OpenAPI pour TONIC
+```http
+http://localhost:9000/contracts/TONIC/OPENAPI?code-applicatif=my-api
 ```
 
 ### Cas d'erreur
 
-1. **Type de composant invalide**
+#### 1. Type de starter kit invalide
+```http
+http://localhost:9000/components/INVALID?code-applicatif=test-project
 ```
-http://localhost:9000/instanciate?typeDeComposant=INVALID&nomDuComposant=test-project
-```
-Réponse: 400 Bad Request - Type de composant non supporté
+**Réponse:** 400 Bad Request - Type de starter kit non supporté
 
-2. **Feature invalide ou mal orthographiée**
+#### 2. Feature invalide pour TONIC
+```http
+http://localhost:9000/components/TONIC?code-applicatif=test-project&features=invalid-feature
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=toni-starter-security-authap-v2-client
-```
-Réponse: 400 Bad Request - Feature non disponible
+**Réponse:** 400 Bad Request - Feature non disponible
 
-3. **Casse incorrecte dans les features**
+#### 3. Paramètres requis manquants
+```http
+http://localhost:9000/components/TONIC
 ```
-http://localhost:9000/instanciate?typeDeComposant=TONIC&nomDuComposant=test-project&features=TONI-STARTER-SECURITY-AUTHAPP-V2-CLIENT
+**Réponse:** 400 Bad Request - Paramètre code-applicatif manquant
+
+#### 4. Type non implémenté
+```http
+http://localhost:9000/components/HUMAN?code-applicatif=test-project
 ```
-Réponse: 400 Bad Request - Feature non reconnue
+**Réponse:** 500 Internal Server Error - Type non encore implémenté
 
-4. **Paramètres requis manquants**
-```
-http://localhost:9000/instanciate?typeDeComposant=TONIC
-```
-Réponse: 400 Bad Request - Paramètre nomDuComposant manquant
+## Types disponibles
 
-5. **Type de composant non implémenté**
-```
-http://localhost:9000/instanciate?typeDeComposant=HUMAN&nomDuComposant=test-project
-```
-Réponse: 500 Internal Server Error - Type de composant non encore implémenté
+### Starter Kits
+- `TONIC` (implémenté)
+- `HUMAN` (non implémenté)
+- `STUMP` (non implémenté)
 
-## Types de composants disponibles
+### Contracts
+- `OPENAPI` (implémenté)
+- `AVRO` (implémenté)
+- `SOAP` (non implémenté)
 
-Actuellement supportés :
-- `TONIC`
-- `HUMAN`
+### Libraries
+- `JAVA` (non implémenté)
+- `NODE` (non implémenté)
 
-## Features disponibles
+Note: Actuellement, seuls le starter kit TONIC et les contrats OPENAPI et AVRO sont pleinement implémentés. Les autres types sont listés mais pas encore disponibles.
 
-Les features sont uniquement disponibles pour les composants TONIC. La liste des features disponibles est dynamiquement récupérée depuis le service TONIC et peut inclure :
+### Features TONIC disponibles
+
+Les features sont uniquement disponibles pour le starter kit TONIC. La liste des features disponibles est dynamiquement récupérée depuis le service TONIC et peut inclure :
 
 - toni-starter-security-authapp-v2-client
 - toni-starter-security-authapp-v3-client
@@ -135,3 +173,10 @@ Le projet utilise :
 - WebClient pour les appels HTTP
 - Lombok pour la réduction du boilerplate
 - SpringDoc pour la documentation OpenAPI
+
+### Notes importantes
+
+- Le paramètre `code-applicatif` est obligatoire pour toutes les opérations de génération
+- Les features doivent être spécifiées en tant que paramètres de requête répétés
+- Les features de contrat (`toni-contract-openapi`, `toni-contract-avro`) ne sont disponibles que via l'endpoint `/contracts`
+- Seul le starter kit TONIC est actuellement implémenté et fonctionnel
