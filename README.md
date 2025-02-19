@@ -19,13 +19,13 @@ FAIN_J est une API facade qui uniformise l'accès aux différents instanciateurs
 L'architecture se compose de trois diagrammes principaux :
 
 1. **Diagramme de séquence** - Illustre le flux d'interaction entre les composants :
-   ![Diagramme de séquence](/src/main/resources/diagrams/sequence-diagram.png)
+   ![Diagramme de séquence](/doc/diagrams/sequence-diagram.png)
 
 2. **Diagramme de classes** - Montre la structure des classes du système :
-   ![Diagramme de classes](/src/main/resources/diagrams/class-diagram.png)
+   ![Diagramme de classes](/doc/diagrams/class-diagram.png)
 
 3. **Diagramme de composants** - Présente l'architecture globale du système :
-   ![Diagramme de composants](/src/main/resources/diagrams/component-diagram.png)
+   ![Diagramme de composants](/doc/diagrams/component-diagram.png)
 
 ## Points d'accès REST
 
