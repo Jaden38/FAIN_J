@@ -3,9 +3,8 @@ package fr.cnam.initializr.facade.config;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Map;
 
 /**
  * Configuration des propriétés pour les différents instanciateurs de projets.
@@ -21,12 +20,13 @@ import java.util.Map;
 @Getter
 @Configuration
 @ConfigurationProperties(prefix = "initializer")
+@EnableConfigurationProperties(TonicConfig.class)
 public class InitializerConfig {
 
     /**
      * Configuration spécifique à l'instanciateur TONIC.
      */
-    private Map<String, Object> tonic;
+    private TonicConfig tonic;
 
     /**
      * Récupère l'URL de l'instanciateur TONIC.
@@ -34,7 +34,7 @@ public class InitializerConfig {
      * @return L'URL de l'instanciateur TONIC
      */
     public String getTonicUrl() {
-        return (String) tonic.get("url");
+        return tonic.getUrl();
     }
 
     /**
@@ -43,7 +43,6 @@ public class InitializerConfig {
      * @return L'identifiant du groupe par défaut pour l'instanciateur TONIC
      */
     public String getTonicDefaultGroupId() {
-        return (String) tonic.get("group-id");
+        return tonic.getGroupId();
     }
-
 }

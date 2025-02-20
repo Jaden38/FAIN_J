@@ -164,8 +164,8 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      * @return ResponseEntity contenant le type de starter kit pour les bibliothèques
      */
     @Override
-    public ResponseEntity<StarterKitType> getAvailableLibraryStarterKits() {
-        return ResponseEntity.ok(StarterKitType.TONIC);
+    public ResponseEntity<List<StarterKitType>> getAvailableLibraryStarterKits() {
+        return ResponseEntity.ok(Collections.emptyList());
     }
 
     /**
@@ -181,7 +181,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
     public ResponseEntity<Resource> createLibrary(
             StarterKitType starterKit,
             String codeApplicatif) {
-        throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE);
+        throw new ServiceException(CommonProblemType.RESSOURCE_NON_TROUVEE);
     }
 
 
@@ -210,7 +210,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
         if (starterKitType == StarterKitType.TONIC) {
 
             String groupId = initializerConfig.getTonicDefaultGroupId();
-            String artifactId = codeApplicatif.replace("_", "-").toLowerCase();
+            String artifactId = codeApplicatif.replaceAll("[-_]", "").toLowerCase();
 
             if (validateContractFeatures && features != null && features.stream()
                     .anyMatch(feature -> feature.startsWith("toni-contract-"))) {

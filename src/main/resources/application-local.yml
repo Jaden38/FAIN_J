@@ -1,8 +1,6 @@
 initializer:
   tonic:
     url: http://localhost:8080
-  human:
-    url: http://localhost:8081
 
 server:
   port: 9000

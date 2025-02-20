@@ -3,6 +3,7 @@ package fr.cnam.initializr.facade.service.tonic;
 import fr.cnam.initializr.facade.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
 import fr.cnam.initializr.facade.client.tonic.controller.rest.model.TonicDependenciesResponse;
 import fr.cnam.initializr.facade.config.InitializerConfig;
+import fr.cnam.toni.starter.core.exceptions.ClientException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -10,10 +11,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.List;
@@ -53,13 +52,6 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
         String tonicInitializrUrl = properties.getTonicUrl();
         this.webClient = WebClient.builder()
                 .baseUrl(tonicInitializrUrl)
-                .defaultRequest(req -> req.header("User-Agent", "TonicProjectGenerationService"))
-                .filter(ExchangeFilterFunction.ofRequestProcessor(
-                        clientRequest -> {
-                            log.debug("Request: {} {}", clientRequest.method(), clientRequest.url());
-                            return Mono.just(clientRequest);
-                        }
-                ))
                 .build();
         log.info("Initialized TonicProjectGenerationService with URL: {}", tonicInitializrUrl);
     }
@@ -131,8 +123,8 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
                     .block();
 
             if (projectZip == null) {
-                throw new ServiceException(
-                        CommonProblemType.ERREUR_INATTENDUE
+                throw new ClientException(
+                        CommonProblemType.DONNEES_INVALIDES
                 );
             }
 
@@ -174,8 +166,8 @@ public class TonicProjectGenerationService implements TonicProjectGenerationCont
                     .block();
 
             if (dependencies == null) {
-                throw new ServiceException(
-                        CommonProblemType.ERREUR_INATTENDUE
+                throw new ClientException(
+                        CommonProblemType.DONNEES_INVALIDES
                 );
             }
 
