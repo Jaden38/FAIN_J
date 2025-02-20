@@ -1,13 +1,15 @@
-package fr.cnam.initializr.facade.controller;
+package fr.cnam.initializr.facade.controller.rest;
 
-import fr.cnam.initializr.facade.business.ComponentArchive;
-import fr.cnam.initializr.facade.business.ComponentBusinessService;
-import fr.cnam.initializr.facade.business.ComponentRequest;
-import fr.cnam.initializr.facade.business.StarterKitBusiness;
+import fr.cnam.initializr.facade.business.model.ComponentArchive;
+import fr.cnam.initializr.facade.business.service.ComponentBusinessService;
+import fr.cnam.initializr.facade.business.model.ComponentRequest;
+import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
+import fr.cnam.initializr.facade.controller.mapper.ComponentMapper;
 import fr.cnam.initializr.facade.controller.rest.api.ComponentsApi;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,11 +34,19 @@ public class ComponentController implements ComponentsApi {
                                                           String codeApplicatif,
                                                           List<String> features) {
         ComponentRequest businessRequest = mapper.toBusiness(starterKit, productName, codeApplicatif, features);
-
         ComponentArchive archive = componentService.generateComponent(businessRequest);
 
+        String filename = String.format("%s-%s.zip", productName, codeApplicatif);
+
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentType(MediaType.parseMediaType("application/zip"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                 .body(archive.getContent());
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getComponentFeatures(StarterKitType starterKit) {
+        List<String> features = componentService.getComponentFeatures(starterKit);
+        return ResponseEntity.ok(features);
     }
 }

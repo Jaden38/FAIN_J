@@ -1,4 +1,4 @@
-package fr.cnam.initializr.facade.business;
+package fr.cnam.initializr.facade.business.model;
 
 import lombok.Getter;
 import lombok.Setter;

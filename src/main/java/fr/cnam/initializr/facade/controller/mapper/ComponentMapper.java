@@ -1,7 +1,7 @@
-package fr.cnam.initializr.facade.controller;
+package fr.cnam.initializr.facade.controller.mapper;
 
-import fr.cnam.initializr.facade.business.ComponentRequest;
-import fr.cnam.initializr.facade.business.StarterKitBusiness;
+import fr.cnam.initializr.facade.business.model.ComponentRequest;
+import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import org.springframework.stereotype.Component;
 
