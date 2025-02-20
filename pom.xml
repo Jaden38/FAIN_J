@@ -103,10 +103,10 @@
                         </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/target/maven-shared-archive-resources/openapi-tcinj.yml</inputSpec>
-                            <generatorName>spring</generatorName>
-                            <apiPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.api</apiPackage>
-                            <modelPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.model</modelPackage>
-                            <invokerPackage>fr.cnam.initializr.facade.client.tonic.controller.rest.invoker</invokerPackage>
+                            <generatorName>java</generatorName>
+                            <apiPackage>fr.cnam.client.tonic.controller.rest.api</apiPackage>
+                            <modelPackage>fr.cnam.client.tonic.controller.rest.model</modelPackage>
+                            <invokerPackage>fr.cnam.client.tonic.controller.rest.invoker</invokerPackage>
                             <languageSpecificPrimitives>
                                 <languageSpecificPrimitive>Problem</languageSpecificPrimitive>
                                 <languageSpecificPrimitive>ProblemResponse</languageSpecificPrimitive>
@@ -123,12 +123,10 @@
                             </schemaMappings>
                             <configOptions>
                                 <sourceFolder>src/gen/java</sourceFolder>
-                                <delegatePattern>true</delegatePattern>
                                 <openApiNullable>false</openApiNullable>
                                 <useSpringBoot3>true</useSpringBoot3>
-                                <requestMappingMode>api_interface</requestMappingMode>
                                 <useTags>true</useTags>
-                                <interfaceOnly>true</interfaceOnly>
+                                <library>restclient</library>
                             </configOptions>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
