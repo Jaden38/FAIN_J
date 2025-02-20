@@ -1,6 +1,9 @@
-package fr.cnam.initializr.facade.adapter.rest;
+package fr.cnam.initializr.facade.controller;
 
-import fr.cnam.initializr.facade.application.service.ComponentService;
+import fr.cnam.initializr.facade.business.ComponentArchive;
+import fr.cnam.initializr.facade.business.ComponentBusinessService;
+import fr.cnam.initializr.facade.business.ComponentRequest;
+import fr.cnam.initializr.facade.business.StarterKitBusiness;
 import fr.cnam.initializr.facade.controller.rest.api.ComponentsApi;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import lombok.RequiredArgsConstructor;
@@ -14,17 +17,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ComponentController implements ComponentsApi {
-    private final
-    ComponentService componentService;
+    private final ComponentBusinessService componentService;
+    private final ComponentMapper mapper;
 
     @Override
     public ResponseEntity<List<StarterKitType>> getAllComponents() {
-        return ResponseEntity.ok(componentService.getAvailableComponents());
-    }
-
-    @Override
-    public ResponseEntity<List<String>> getComponentFeatures(StarterKitType starterKit) {
-        return ResponseEntity.ok(componentService.getComponentFeatures(starterKit));
+        List<StarterKitBusiness> components = componentService.getAvailableComponents();
+        return ResponseEntity.ok(mapper.toApiModel(components));
     }
 
     @Override
@@ -32,9 +31,12 @@ public class ComponentController implements ComponentsApi {
                                                           String productName,
                                                           String codeApplicatif,
                                                           List<String> features) {
-        Resource resource = componentService.generateComponent(starterKit, productName, codeApplicatif, features);
+        ComponentRequest businessRequest = mapper.toBusiness(starterKit, productName, codeApplicatif, features);
+
+        ComponentArchive archive = componentService.generateComponent(businessRequest);
+
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+                .body(archive.getContent());
     }
 }
