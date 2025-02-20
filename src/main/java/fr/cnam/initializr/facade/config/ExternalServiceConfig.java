@@ -1,23 +1,16 @@
-package fr.cnam.initializr.facade.provider.tonic.config;
+package fr.cnam.initializr.facade.config;
 
 import fr.cnam.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
 import fr.cnam.client.tonic.controller.rest.invoker.ApiClient;
-import fr.cnam.initializr.facade.config.InitializerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class TonicProviderConfig {
-
+public class ExternalServiceConfig {
     @Bean
-    public ApiClient tonicApiClient(InitializerConfig config) {
+    public TonicProjectGenerationControllerApi tonicApi() {
         ApiClient apiClient = new ApiClient();
-        apiClient.setBasePath(config.getTonicUrl());
-        return apiClient;
-    }
-
-    @Bean
-    public TonicProjectGenerationControllerApi tonicApi(ApiClient apiClient) {
+        // Configure base URL and other settings
         return new TonicProjectGenerationControllerApi(apiClient);
     }
 }
