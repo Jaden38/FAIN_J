@@ -21,7 +21,7 @@ public class LibraryBusinessService {
         throw new ServiceException(CommonProblemType.RESSOURCE_NON_TROUVEE);
     }
 
-    public List<ContractType> getAvailableLibraryStarterKits(StarterKitType type) {
+    public List<StarterKitType> getAvailableLibraryStarterKits(StarterKitType type) {
         throw new ServiceException(CommonProblemType.RESSOURCE_NON_TROUVEE);
     }
 
