@@ -45,6 +45,7 @@ Génère un nouveau projet starter kit.
 
 **Paramètres:**
 - `starter-kit` (chemin, requis): Type du starter kit
+- `product-name` (query, requis): Nom du produit auquel le composant appartient
 - `code-applicatif` (query, requis): Code applicatif du composant à générer
 - `features` (query, optionnel): Liste des features à inclure
 
@@ -64,6 +65,7 @@ Génère un nouveau projet de contrat.
 **Paramètres:**
 - `starter-kit` (chemin, requis): Type du starter kit
 - `contract-type` (chemin, requis): Type du contrat
+- `product-name` (query, requis): Nom du produit auquel le composant appartient
 - `code-applicatif` (query, requis): Code applicatif du composant à générer
 
 ### Bibliothèques
@@ -78,6 +80,7 @@ Génère un nouveau projet de bibliothèque.
 
 **Paramètres:**
 - `starter-kit` (chemin, requis): Type du starter kit
+- `product-name` (query, requis): Nom du produit auquel le composant appartient
 - `code-applicatif` (query, requis): Code applicatif du composant à générer
 
 ## Guide d'utilisation
@@ -86,12 +89,12 @@ Génère un nouveau projet de bibliothèque.
 
 #### 1. Starter Kit TONIC avec une feature
 ```http
-http://localhost:9000/components/TONIC?code-applicatif=test-project&features=toni-starter-security-authapp-v2-client
+http://localhost:9000/components/TONIC?product-name=myproduct&code-applicatif=test-project&features=toni-starter-security-authapp-v2-client
 ```
 
 #### 2. Starter Kit TONIC avec plusieurs features
 ```http
-http://localhost:9000/components/TONIC?code-applicatif=test-project&features=toni-starter-security-authapp-v2-client&features=toni-starter-client-espoir
+http://localhost:9000/components/TONIC?product-name=myproduct&code-applicatif=test-project&features=toni-starter-security-authapp-v2-client&features=toni-starter-client-espoir
 ```
 
 #### 3. Lister les features disponibles pour TONIC
@@ -101,20 +104,20 @@ http://localhost:9000/components/TONIC/features
 
 #### 4. Créer un contrat OpenAPI pour TONIC
 ```http
-http://localhost:9000/contracts/TONIC/OPENAPI?code-applicatif=my-api
+http://localhost:9000/contracts/TONIC/OPENAPI?product-name=myproduct&code-applicatif=my-api
 ```
 
 ### Cas d'erreur
 
 #### 1. Type de starter kit invalide
 ```http
-http://localhost:9000/components/INVALID?code-applicatif=test-project
+http://localhost:9000/components/INVALID?product-name=myproduct&code-applicatif=test-project
 ```
 **Réponse:** 400 Bad Request - Type de starter kit non supporté
 
 #### 2. Feature invalide pour TONIC
 ```http
-http://localhost:9000/components/TONIC?code-applicatif=test-project&features=invalid-feature
+http://localhost:9000/components/TONIC?product-name=myproduct&code-applicatif=test-project&features=invalid-feature
 ```
 **Réponse:** 400 Bad Request - Feature non disponible
 
@@ -122,11 +125,11 @@ http://localhost:9000/components/TONIC?code-applicatif=test-project&features=inv
 ```http
 http://localhost:9000/components/TONIC
 ```
-**Réponse:** 400 Bad Request - Paramètre code-applicatif manquant
+**Réponse:** 400 Bad Request - Paramètres product-name et code-applicatif manquants
 
 #### 4. Type non implémenté
 ```http
-http://localhost:9000/components/HUMAN?code-applicatif=test-project
+http://localhost:9000/components/HUMAN?product-name=myproduct&code-applicatif=test-project
 ```
 **Réponse:** 500 Internal Server Error - Type non encore implémenté
 
@@ -176,6 +179,7 @@ Le projet utilise :
 
 ### Notes importantes
 
+- Le paramètre `product-name` est obligatoire pour toutes les opérations de génération
 - Le paramètre `code-applicatif` est obligatoire pour toutes les opérations de génération
 - Les features doivent être spécifiées en tant que paramètres de requête répétés
 - Les features de contrat (`toni-contract-openapi`, `toni-contract-avro`) ne sont disponibles que via l'endpoint `/contracts`

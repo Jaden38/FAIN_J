@@ -98,6 +98,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      * Génère un projet à partir d'un starter kit avec les fonctionnalités spécifiées.
      *
      * @param starterKit     Le type de starter kit à utiliser
+     * @param productName    Le nom du produit
      * @param codeApplicatif Le code applicatif du projet
      * @param features       Liste des fonctionnalités à inclure
      * @return ResponseEntity contenant l'archive du projet généré
@@ -105,9 +106,10 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
     @Override
     public ResponseEntity<Resource> instantiateStarterKit(
             StarterKitType starterKit,
+            String productName,
             String codeApplicatif,
             List<String> features) {
-        return internalInstanciateStarterKit(starterKit, codeApplicatif, features, true);
+        return internalInstanciateStarterKit(starterKit, productName, codeApplicatif, features, true);
     }
 
     /**
@@ -131,6 +133,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      *
      * @param starterKit     Le type de starter kit
      * @param contractType   Le type de contrat à générer
+     * @param productName    Le nom du produit
      * @param codeApplicatif Le code applicatif du projet
      * @return ResponseEntity contenant l'archive du contrat généré
      * @throws ServiceException si la génération échoue
@@ -139,6 +142,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
     public ResponseEntity<Resource> createContract(
             StarterKitType starterKit,
             ContractType contractType,
+            String productName,
             String codeApplicatif) {
 
         log.info("Received request to generate {} contract for {} starter kit", contractType, starterKit);
@@ -149,6 +153,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
                     "toni-contract-openapi" : "toni-contract-avro";
             return internalInstanciateStarterKit(
                     starterKit,
+                    productName,
                     codeApplicatif,
                     Collections.singletonList(contractFeature),
                     false
@@ -173,6 +178,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      * Cette fonctionnalité n'est pas encore implémentée.
      *
      * @param starterKit     Le type de starter kit
+     * @param productName    Le nom du produit
      * @param codeApplicatif Le code applicatif de la bibliothèque
      * @return ResponseEntity contenant l'archive de la bibliothèque générée
      * @throws ServiceException car la fonctionnalité n'est pas implémentée
@@ -180,6 +186,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
     @Override
     public ResponseEntity<Resource> createLibrary(
             StarterKitType starterKit,
+            String productName,
             String codeApplicatif) {
         throw new ServiceException(CommonProblemType.RESSOURCE_NON_TROUVEE);
     }
@@ -201,6 +208,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
      */
     private ResponseEntity<Resource> internalInstanciateStarterKit(
             StarterKitType starterKitType,
+            String productName,
             String codeApplicatif,
             List<String> features,
             boolean validateContractFeatures) {
@@ -209,7 +217,7 @@ public class ProjectGenerationController implements ComponentsApi, ContractsApi,
 
         if (starterKitType == StarterKitType.TONIC) {
 
-            String groupId = initializerConfig.getTonicDefaultGroupId();
+            String groupId = initializerConfig.getTonicDefaultGroupId() + "." + productName;
             String artifactId = codeApplicatif.replaceAll("[-_]", "").toLowerCase();
 
             if (validateContractFeatures && features != null && features.stream()
