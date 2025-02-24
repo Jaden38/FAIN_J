@@ -27,7 +27,7 @@ public class TonicFeaturesService {
     public List<String> getAvailableFeatures() {
         try {
             log.debug("Cache miss - fetching features from TONIC service");
-            var dependencies = tonicApi.getDependencies("3.2.0");
+            var dependencies = tonicApi.getDependencies(null);
 
             if (dependencies.getDependencies() == null || dependencies.getDependencies().isEmpty()) {
                 log.warn("No dependencies found in TONIC service response");
