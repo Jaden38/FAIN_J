@@ -50,8 +50,7 @@ public class TonicComponentProvider implements ComponentProvider {
             byte[] content = responseSpec.body(byte[].class);
             return mapper.toBusinessArchive(content);
         } catch (Exception e) {
-            throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e,
-                    "Failed to generate component for " + businessRequest.getCodeApplicatif());
+            throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE);
         }
     }
 

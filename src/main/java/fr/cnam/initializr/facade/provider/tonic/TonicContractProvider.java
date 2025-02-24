@@ -8,6 +8,8 @@ import fr.cnam.initializr.facade.business.port.ContractProvider;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.initializr.facade.provider.mapper.TonicMapper;
+import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
+import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -47,7 +49,7 @@ public class TonicContractProvider implements ContractProvider {
             byte[] content = responseSpec.body(byte[].class);
             return mapper.toBusinessArchive(content);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to read contract ZIP content", e);
+            throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE);
         }
     }
 
