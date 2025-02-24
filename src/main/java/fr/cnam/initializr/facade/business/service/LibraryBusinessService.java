@@ -3,7 +3,6 @@ package fr.cnam.initializr.facade.business.service;
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
 import fr.cnam.initializr.facade.business.model.LibraryRequest;
 import fr.cnam.initializr.facade.business.port.LibraryProvider;
-import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;

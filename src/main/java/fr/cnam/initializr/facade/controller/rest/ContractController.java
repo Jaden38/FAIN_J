@@ -1,8 +1,8 @@
 package fr.cnam.initializr.facade.controller.rest;
 
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.service.ContractBusinessService;
 import fr.cnam.initializr.facade.business.model.ContractRequest;
+import fr.cnam.initializr.facade.business.service.ContractBusinessService;
 import fr.cnam.initializr.facade.controller.mapper.ContractMapper;
 import fr.cnam.initializr.facade.controller.rest.api.ContractsApi;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;

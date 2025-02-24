@@ -6,8 +6,8 @@ import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
 import fr.cnam.initializr.facade.business.port.ComponentProvider;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.toni.starter.core.exceptions.ClientException;
-import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
+import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
