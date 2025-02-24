@@ -39,6 +39,7 @@ Retourne la liste des features disponibles pour un type de starter kit.
 
 **Paramètres:**
 - `starter-kit` (chemin, requis): Type du starter kit (TONIC, HUMAN, STUMP)
+- `product-name` (query, requis): Nom du produit
 
 #### GET /components/{starter-kit}
 Génère un nouveau projet starter kit.
@@ -56,6 +57,7 @@ Récupère la liste des types de contrats disponibles pour un starter kit.
 
 **Paramètres:**
 - `starter-kit` (chemin, requis): Type du starter kit
+- `product-name` (query, requis): Nom du produit
 
 **Réponse:** Liste des types supportés (OPENAPI, AVRO, SOAP)
 
@@ -72,6 +74,9 @@ Génère un nouveau projet de contrat.
 
 #### GET /libraries/starter-kits
 Récupère la liste des types de starter kits disponibles pour les bibliothèques.
+
+**Paramètres:**
+- `product-name` (query, requis): Nom du produit
 
 **Réponse:** Liste des types supportés
 
@@ -99,10 +104,15 @@ http://localhost:9000/components/TONIC?product-name=myproduct&code-applicatif=te
 
 #### 3. Lister les features disponibles pour TONIC
 ```http
-http://localhost:9000/components/TONIC/features
+http://localhost:9000/components/TONIC/features?product-name=myproduct
 ```
 
-#### 4. Créer un contrat OpenAPI pour TONIC
+#### 4. Lister les contrats disponibles pour TONIC
+```http
+http://localhost:9000/contracts/TONIC?product-name=myproduct
+```
+
+#### 5. Créer un contrat OpenAPI pour TONIC
 ```http
 http://localhost:9000/contracts/TONIC/OPENAPI?product-name=myproduct&code-applicatif=my-api
 ```
