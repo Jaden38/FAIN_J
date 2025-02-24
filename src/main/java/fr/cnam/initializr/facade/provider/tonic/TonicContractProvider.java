@@ -8,6 +8,7 @@ import fr.cnam.initializr.facade.business.port.ContractProvider;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.initializr.facade.provider.mapper.TonicMapper;
+import fr.cnam.initializr.facade.provider.service.MetricService;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.List;
 public class TonicContractProvider implements ContractProvider {
     private final TonicProjectGenerationControllerApi tonicApi;
     private final TonicMapper mapper;
+    private final MetricService metricService;
 
     @Override
     public ComponentArchive generateContract(ContractRequest request) {
@@ -47,7 +49,10 @@ public class TonicContractProvider implements ContractProvider {
 
         try {
             byte[] content = responseSpec.body(byte[].class);
+            metricService.recordContractGeneration(request);
+
             return mapper.toBusinessArchive(content);
+
         } catch (Exception e) {
             throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE);
         }

@@ -8,6 +8,7 @@ import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
 import fr.cnam.initializr.facade.business.port.ComponentProvider;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.initializr.facade.provider.mapper.TonicMapper;
+import fr.cnam.initializr.facade.provider.service.MetricService;
 import fr.cnam.initializr.facade.provider.service.TonicFeaturesService;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
@@ -21,9 +22,12 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TonicComponentProvider implements ComponentProvider {
+
     private final TonicProjectGenerationControllerApi tonicApi;
     private final TonicMapper mapper;
     private final TonicFeaturesService featuresService;
+    private final MetricService metricService;
+
 
     @Override
     public ComponentArchive generateComponent(ComponentRequest businessRequest) {
@@ -48,7 +52,10 @@ public class TonicComponentProvider implements ComponentProvider {
             );
 
             byte[] content = responseSpec.body(byte[].class);
+            metricService.recordComponentGeneration(businessRequest);
+
             return mapper.toBusinessArchive(content);
+
         } catch (Exception e) {
             throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE);
         }

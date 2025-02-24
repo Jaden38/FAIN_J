@@ -1,7 +1,13 @@
 initializer:
   tonic:
     url: ${TONIC_URL}
-
+  metric:
+    url: ${METRIC_URL:#{null}}
+  starter-kit:
+    versions:
+      TONIC: 1.3.0
+      STUMP: 22.9.0
+      HUMAN: 1.0.0
 cache:
   tonic-features:
     ttl: 43200000 # 12 hours
