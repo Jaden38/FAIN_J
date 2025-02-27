@@ -3,6 +3,7 @@ initializer:
     url: ${TONIC_URL}
   metric:
     url: ${METRIC_URL:#{null}}
+    dds-prefix: ""
   starter-kit:
     versions:
       TONIC: 1.3.0
