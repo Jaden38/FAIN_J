@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
 
 import java.text.DateFormat;
 
@@ -37,13 +36,8 @@ public class MetricClientConfig {
             log.warn("Metric service URL is not configured. Using no-op implementation for ModuleApi.");
             return new ModuleApi() {
                 @Override
-                public ResponseEntity<ResponseOkAvecModule> putModuleWithHttpInfo(ModuleResource moduleResource) {
-                    return ResponseEntity.ok().build();
-                }
-
-                @Override
                 public ResponseOkAvecModule putModule(ModuleResource moduleResource) {
-                    return null; // or an empty instance if needed
+                    return new ResponseOkAvecModule();
                 }
             };
         }
