@@ -5,7 +5,6 @@ import fr.cnam.client.tonic.controller.rest.model.ProjectRequest;
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
 import fr.cnam.initializr.facade.business.model.ContractRequest;
 import fr.cnam.initializr.facade.business.port.ContractProvider;
-import fr.cnam.initializr.facade.business.service.MetricBusinessService;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.initializr.facade.provider.mapper.TonicMapper;

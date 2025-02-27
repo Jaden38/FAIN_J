@@ -20,6 +20,7 @@ import java.util.List;
 public class ComponentBusinessService {
     private final ComponentProvider provider;
     private final MetricBusinessService metricBusinessService;
+    private final ValidationService validationService;
 
     public ComponentArchive generateComponent(ComponentRequest request) {
         validateRequest(request);
@@ -42,7 +43,7 @@ public class ComponentBusinessService {
     }
 
     public List<String> getComponentFeatures(StarterKitType type) {
-        validateStarterKitType(type);
+        validationService.validateStarterKitType(type);
         try {
             return provider.getComponentFeatures(type);
         } catch (Exception e) {
@@ -51,40 +52,9 @@ public class ComponentBusinessService {
     }
 
     private void validateRequest(ComponentRequest request) {
-        validateStarterKitType(request.getType());
-
-        if (request.getProductName() == null || request.getProductName().trim().isEmpty()) {
-            log.warn("Product name cannot be empty");
-            throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
-                    "Product name cannot be empty"
-            );
-        }
-        if (request.getCodeApplicatif() == null || request.getCodeApplicatif().trim().isEmpty()) {
-            log.warn("Code applicatif cannot be empty");
-            throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
-                    "Code applicatif cannot be empty"
-            );
-        }
-    }
-
-    private void validateStarterKitType(StarterKitType type) {
-        if (type == null) {
-            log.warn("Starter kit type cannot be null");
-            throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
-                    "Starter kit type cannot be null"
-            );
-        }
-
-        if (type != StarterKitType.TONIC) {
-            log.warn("Invalid starter kit type: {}. Only TONIC is currently supported", type);
-            throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
-                    "Invalid starter kit type: " + type + ". Only TONIC is currently supported"
-            );
-        }
+        validationService.validateStarterKitType(request.getType());
+        validationService.validateProductName(request.getProductName());
+        validationService.validateCodeApplicatif(request.getCodeApplicatif());
     }
 
     private void validateFeatures(ComponentRequest request) {
