@@ -21,7 +21,6 @@ public class ApiMetricProvider implements MetricProvider {
     public void recordMetric(ModuleMetric moduleMetric) {
         try {
             ModuleResource moduleResource = metricMapper.toModuleResource(moduleMetric);
-            log.debug("Sending module resource to metrics service: {}", moduleResource);
             moduleApi.putModule(moduleResource);
         } catch (Exception e) {
             log.error("Failed to record metric", e);

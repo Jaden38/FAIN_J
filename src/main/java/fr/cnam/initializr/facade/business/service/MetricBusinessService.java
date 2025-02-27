@@ -65,7 +65,7 @@ public class MetricBusinessService {
 
     private void recordMetricSafely(ModuleMetric moduleMetric, String resourceType, String codeApplicatif) {
         try {
-            log.debug("Recording metric for {} generation: {}", resourceType, moduleMetric);
+            log.debug("Recording metric for {} generation: {}", resourceType, moduleMetric.toString());
             metricProvider.recordMetric(moduleMetric);
             log.info("Recorded {} generation metric for {}", resourceType, codeApplicatif);
         } catch (RuntimeException e) {
