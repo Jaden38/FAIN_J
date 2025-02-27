@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -22,8 +21,14 @@ public class MetricService {
 
     private final ModuleApi moduleApi;
 
-    @Value("#{${initializer.starter-kit.versions}}")
-    private Map<String, String> starterKitVersions;
+    @Value("${initializer.starter-kit.versions.TONIC}")
+    private String tonicVersion;
+
+    @Value("${initializer.starter-kit.versions.STUMP}")
+    private String stumpVersion;
+
+    @Value("${initializer.starter-kit.versions.HUMAN:1.0.0}")
+    private String humanVersion;
 
     public void recordComponentGeneration(ComponentRequest request) {
         try {
@@ -36,10 +41,14 @@ public class MetricService {
                 moduleResource.setUsecases(String.join(",", request.getFeatures()));
             }
 
+            log.debug("Sending module resource to metrics service: {}", moduleResource);
+
             ResponseEntity<ResponseOkAvecModule> response = moduleApi.putModule(moduleResource);
+
             log.info("Recorded component generation metric for {} with status: {}",
                     request.getCodeApplicatif(), response.getStatusCode());
         } catch (Exception e) {
+            log.error("Failed to record metric for component generation", e);
             log.warn("Failed to record metric for component generation: {}", e.getMessage());
         }
     }
@@ -77,7 +86,7 @@ public class MetricService {
 
     private ModuleResource createModuleResource(String productName, String codeModule, String starterKitType) {
         ModuleResource moduleResource = new ModuleResource();
-        moduleResource.setDds(productName);
+        moduleResource.setDds("DN_TEST_" + productName);
         moduleResource.setCodeModule(codeModule);
         moduleResource.setDateInstanciation(LocalDate.now());
         moduleResource.setTypeSK(starterKitType);
@@ -103,6 +112,11 @@ public class MetricService {
     }
 
     private String determineVersion(String starterKitType) {
-        return starterKitVersions.getOrDefault(starterKitType, "1.0.0");
+        return switch (starterKitType) {
+            case "TONIC" -> tonicVersion;
+            case "STUMP" -> stumpVersion;
+            case "HUMAN" -> humanVersion;
+            default -> "1.0.0";
+        };
     }
 }
