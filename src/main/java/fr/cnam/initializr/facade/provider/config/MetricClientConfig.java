@@ -1,50 +1,71 @@
 package fr.cnam.initializr.facade.provider.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.cnam.initializr.facade.business.port.MetricProvider;
 import fr.cnam.initializr.facade.client.metric.controller.rest.api.ModuleApi;
+import fr.cnam.initializr.facade.client.metric.controller.rest.invoker.ApiClient;
+import fr.cnam.initializr.facade.client.metric.controller.rest.model.ModuleResource;
+import fr.cnam.initializr.facade.client.metric.controller.rest.model.ResponseOkAvecModule;
+import fr.cnam.initializr.facade.provider.mapper.MetricMapper;
+import fr.cnam.initializr.facade.provider.metric.ApiMetricProvider;
+import fr.cnam.initializr.facade.provider.metric.NoOpMetricProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestClient;
+import org.springframework.http.ResponseEntity;
+
+import java.text.DateFormat;
 
 @Configuration
 @Slf4j
 public class MetricClientConfig {
 
-    @Value("${initializer.metric.url:#{null}}")
-    private String metricServiceUrl;
+    private final String metricServiceUrl;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    public MetricClientConfig(
+            @Value("${initializer.metric.url:#{null}}") String metricServiceUrl,
+            ObjectMapper objectMapper) {
+        this.metricServiceUrl = metricServiceUrl;
+        this.objectMapper = objectMapper;
+    }
 
     @Bean
     public ModuleApi moduleApi() {
         if (metricServiceUrl == null) {
             log.warn("Metric service URL is not configured. Using no-op implementation for ModuleApi.");
-            return new ModuleApi() {};
+            return new ModuleApi() {
+                @Override
+                public ResponseEntity<ResponseOkAvecModule> putModuleWithHttpInfo(ModuleResource moduleResource) {
+                    return ResponseEntity.ok().build();
+                }
+
+                @Override
+                public ResponseOkAvecModule putModule(ModuleResource moduleResource) {
+                    return null; // or an empty instance if needed
+                }
+            };
         }
 
         log.info("Configuring ModuleApi with metric service URL: {}", metricServiceUrl);
 
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper);
+        DateFormat dateFormat = ApiClient.createDefaultDateFormat();
+        ApiClient apiClient = new ApiClient(objectMapper, dateFormat);
+        apiClient.setBasePath(metricServiceUrl);
 
-        RestClient restClient = RestClient.builder()
-                .baseUrl(metricServiceUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .requestInterceptor((request, body, execution) -> {
-                    log.debug("Sending request to: {} {}", request.getMethod(), request.getURI());
-                    log.debug("Request headers: {}", request.getHeaders());
-                    log.debug("Request body: {}", new String(body));
-                    return execution.execute(request, body);
-                })
-                .messageConverters(converters -> converters.add(0, converter)) // Add our custom converter with priority
-                .build();
-        return new SimpleModuleApiClient(restClient);
+        ModuleApi moduleApi = new ModuleApi(apiClient);
+        log.debug("ModuleApi configured with baseUrl: {}", apiClient.getBasePath());
+
+        return moduleApi;
+    }
+
+    @Bean
+    public MetricProvider metricProvider(ModuleApi moduleApi, MetricMapper metricMapper) {
+        if (metricServiceUrl == null) {
+            log.warn("Metric service URL is not configured. Using no-op implementation for MetricProvider.");
+            return new NoOpMetricProvider();
+        }
+        return new ApiMetricProvider(moduleApi, metricMapper);
     }
 }

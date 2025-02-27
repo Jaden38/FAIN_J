@@ -19,12 +19,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ComponentBusinessService {
     private final ComponentProvider provider;
+    private final MetricBusinessService metricBusinessService;
 
     public ComponentArchive generateComponent(ComponentRequest request) {
         validateRequest(request);
         validateFeatures(request);
         try {
-            return provider.generateComponent(request);
+            ComponentArchive archive = provider.generateComponent(request);
+            metricBusinessService.recordComponentGeneration(request);
+            return archive;
         } catch (Exception e) {
             throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
         }
