@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClient;
 import java.util.Arrays;
 
 @Configuration
-public class ProviderConfig {
+public class TonicProviderConfig {
 
     @Value("${initializer.tonic.url}")
     private String tonicUrl;
@@ -27,9 +27,7 @@ public class ProviderConfig {
 
         RestClient restClient = RestClient.builder()
                 .baseUrl(tonicUrl)
-                .messageConverters(converters -> {
-                    converters.add(0, byteArrayConverter);
-                })
+                .messageConverters(converters -> converters.add(0, byteArrayConverter))
                 .build();
 
         ApiClient apiClient = new ApiClient(restClient);
