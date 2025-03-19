@@ -14,6 +14,7 @@ import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ public class TonicComponentProvider implements ComponentProvider {
 
             return mapper.toBusinessArchive(content);
 
-        } catch (Exception e) {
+        } catch (RestClientResponseException e) {
             throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
         }
     }

@@ -7,7 +7,6 @@ import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.toni.starter.core.exceptions.ClientException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
-import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,13 +23,9 @@ public class ContractBusinessService {
 
     public ComponentArchive generateContract(ContractRequest request) {
         validateRequest(request);
-        try {
-            ComponentArchive archive = provider.generateContract(request);
-            metricBusinessService.recordContractGeneration(request);
-            return archive;
-        } catch (Exception e) {
-            throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
-        }
+        ComponentArchive archive = provider.generateContract(request);
+        metricBusinessService.recordContractGeneration(request);
+        return archive;
     }
 
     public List<ContractType> getAvailableContracts(StarterKitType type) {

@@ -7,7 +7,6 @@ import fr.cnam.initializr.facade.business.port.ComponentProvider;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.toni.starter.core.exceptions.ClientException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
-import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,30 +24,18 @@ public class ComponentBusinessService {
     public ComponentArchive generateComponent(ComponentRequest request) {
         validateRequest(request);
         validateFeatures(request);
-        try {
-            ComponentArchive archive = provider.generateComponent(request);
-            metricBusinessService.recordComponentGeneration(request);
-            return archive;
-        } catch (Exception e) {
-            throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
-        }
+        ComponentArchive archive = provider.generateComponent(request);
+        metricBusinessService.recordComponentGeneration(request);
+        return archive;
     }
 
     public List<StarterKitBusiness> getAvailableComponents() {
-        try {
-            return provider.getAvailableComponents();
-        } catch (Exception e) {
-            throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
-        }
+        return provider.getAvailableComponents();
     }
 
     public List<String> getComponentFeatures(StarterKitType type) {
         validationService.validateStarterKitType(type);
-        try {
-            return provider.getComponentFeatures(type);
-        } catch (Exception e) {
-            throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
-        }
+        return provider.getComponentFeatures(type);
     }
 
     private void validateRequest(ComponentRequest request) {

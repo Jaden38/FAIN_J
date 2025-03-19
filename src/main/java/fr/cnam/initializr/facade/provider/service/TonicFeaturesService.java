@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.*;
 
@@ -39,7 +40,7 @@ public class TonicFeaturesService {
             List<String> result = new ArrayList<>(features);
             log.debug("Retrieved {} features from TONIC service", result.size());
             return result;
-        } catch (Exception e) {
+        } catch (RestClientResponseException e) {
             log.error("Error while fetching TONIC features", e);
             throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
         }

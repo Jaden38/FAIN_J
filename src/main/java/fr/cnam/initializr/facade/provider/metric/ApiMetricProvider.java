@@ -19,11 +19,7 @@ public class ApiMetricProvider implements MetricProvider {
 
     @Override
     public void recordMetric(ModuleMetric moduleMetric) {
-        try {
-            ModuleResource moduleResource = metricMapper.toModuleResource(moduleMetric);
-            moduleApi.putModule(moduleResource);
-        } catch (Exception e) {
-            log.error("Failed to record metric", e);
-        }
+        ModuleResource moduleResource = metricMapper.toModuleResource(moduleMetric);
+        moduleApi.putModule(moduleResource);
     }
 }

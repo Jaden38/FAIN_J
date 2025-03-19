@@ -13,6 +13,7 @@ import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,29 +29,28 @@ public class TonicContractProvider implements ContractProvider {
     public ComponentArchive generateContract(ContractRequest request) {
         ProjectRequest clientRequest = mapper.toClientContractRequest(request);
 
-        RestClient.ResponseSpec responseSpec = tonicApi.getProjectZipWithResponseSpec(
-                clientRequest.getDependencies(),
-                clientRequest.getGroupId(),
-                clientRequest.getArtifactId(),
-                clientRequest.getName(),
-                clientRequest.getType(),
-                clientRequest.getDescription(),
-                clientRequest.getVersion(),
-                clientRequest.getBootVersion(),
-                clientRequest.getPackaging(),
-                clientRequest.getApplicationName(),
-                clientRequest.getLanguage(),
-                clientRequest.getPackageName(),
-                clientRequest.getJavaVersion(),
-                clientRequest.getBaseDir()
-        );
-
         try {
+            RestClient.ResponseSpec responseSpec = tonicApi.getProjectZipWithResponseSpec(
+                    clientRequest.getDependencies(),
+                    clientRequest.getGroupId(),
+                    clientRequest.getArtifactId(),
+                    clientRequest.getName(),
+                    clientRequest.getType(),
+                    clientRequest.getDescription(),
+                    clientRequest.getVersion(),
+                    clientRequest.getBootVersion(),
+                    clientRequest.getPackaging(),
+                    clientRequest.getApplicationName(),
+                    clientRequest.getLanguage(),
+                    clientRequest.getPackageName(),
+                    clientRequest.getJavaVersion(),
+                    clientRequest.getBaseDir()
+            );
             byte[] content = responseSpec.body(byte[].class);
 
             return mapper.toBusinessArchive(content);
 
-        } catch (Exception e) {
+        } catch (RestClientResponseException e) {
             throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
         }
     }
