@@ -1,6 +1,6 @@
 package fr.cnam.initializr.facade.provider.metric;
 
-import fr.cnam.initializr.facade.business.model.ModuleMetric;
+import fr.cnam.initializr.facade.business.model.Metric;
 import fr.cnam.initializr.facade.business.port.MetricProvider;
 import fr.cnam.initializr.facade.client.metric.controller.rest.api.ModuleApi;
 import fr.cnam.initializr.facade.client.metric.controller.rest.model.ModuleResource;
@@ -18,8 +18,8 @@ public class ApiMetricProvider implements MetricProvider {
     private final MetricMapper metricMapper;
 
     @Override
-    public void recordMetric(ModuleMetric moduleMetric) {
-        ModuleResource moduleResource = metricMapper.toModuleResource(moduleMetric);
+    public void recordMetric(Metric metric) {
+        ModuleResource moduleResource = metricMapper.toModuleResource(metric);
         moduleApi.putModule(moduleResource);
     }
 }

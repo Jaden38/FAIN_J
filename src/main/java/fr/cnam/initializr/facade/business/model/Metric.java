@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @ToString
 @Getter
 @Setter
-public class ModuleMetric {
+public class Metric {
     private String dds;
     private String codeModule;
     private LocalDate dateInstanciation;

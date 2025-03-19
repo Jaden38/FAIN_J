@@ -1,6 +1,6 @@
 package fr.cnam.initializr.facade.controller.rest;
 
-import fr.cnam.initializr.facade.business.service.LibraryBusinessService;
+import fr.cnam.initializr.facade.business.service.LibraryService;
 import fr.cnam.initializr.facade.controller.mapper.LibraryMapper;
 import fr.cnam.initializr.facade.controller.rest.api.LibrariesApi;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class LibraryController implements LibrariesApi {
-    private final LibraryBusinessService libraryService;
+    private final LibraryService libraryService;
     private final LibraryMapper mapper;
 
     @Override

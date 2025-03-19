@@ -1,8 +1,8 @@
 package fr.cnam.initializr.facade.controller.rest;
 
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.ContractRequest;
-import fr.cnam.initializr.facade.business.service.ContractBusinessService;
+import fr.cnam.initializr.facade.business.model.Contract;
+import fr.cnam.initializr.facade.business.service.ContractService;
 import fr.cnam.initializr.facade.controller.mapper.ContractMapper;
 import fr.cnam.initializr.facade.controller.rest.api.ContractsApi;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ContractController implements ContractsApi {
-    private final ContractBusinessService contractService;
+    private final ContractService contractService;
     private final ContractMapper mapper;
 
     @Override
@@ -27,7 +27,7 @@ public class ContractController implements ContractsApi {
                                                    ContractType contractType,
                                                    String productName,
                                                    String codeApplicatif) {
-        ContractRequest request = mapper.toBusiness(starterKit, contractType, productName, codeApplicatif);
+        Contract request = mapper.toBusiness(starterKit, contractType, productName, codeApplicatif);
         ComponentArchive archive = contractService.generateContract(request);
 
         String filename = String.format("%s-%s-contract.zip", productName, codeApplicatif);

@@ -1,9 +1,9 @@
 package fr.cnam.initializr.facade.business.service;
 
-import fr.cnam.initializr.facade.business.model.ComponentRequest;
-import fr.cnam.initializr.facade.business.model.ContractRequest;
-import fr.cnam.initializr.facade.business.model.LibraryRequest;
-import fr.cnam.initializr.facade.business.model.ModuleMetric;
+import fr.cnam.initializr.facade.business.model.Component;
+import fr.cnam.initializr.facade.business.model.Contract;
+import fr.cnam.initializr.facade.business.model.Library;
+import fr.cnam.initializr.facade.business.model.Metric;
 import fr.cnam.initializr.facade.business.port.MetricProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MetricBusinessService {
+public class MetricService {
 
     private final MetricProvider metricProvider;
 
@@ -31,8 +31,8 @@ public class MetricBusinessService {
     @Value("${initializer.metric.dds-prefix:}")
     private String ddsPrefix;
 
-    public void recordComponentGeneration(ComponentRequest request) {
-        ModuleMetric moduleMetric = createModuleMetric(request.getProductName(),
+    public void recordComponentGeneration(Component request) {
+        Metric moduleMetric = createModuleMetric(request.getProductName(),
                 request.getCodeApplicatif(),
                 request.getType().getValue());
         moduleMetric.setTypeModule(determineComponentType(request.getCodeApplicatif()));
@@ -44,8 +44,8 @@ public class MetricBusinessService {
         recordMetricSafely(moduleMetric, "component", request.getCodeApplicatif());
     }
 
-    public void recordContractGeneration(ContractRequest request) {
-        ModuleMetric moduleMetric = createModuleMetric(request.getProductName(),
+    public void recordContractGeneration(Contract request) {
+        Metric moduleMetric = createModuleMetric(request.getProductName(),
                 request.getCodeApplicatif(),
                 request.getType().name());
         moduleMetric.setTypeModule("contract");
@@ -54,8 +54,8 @@ public class MetricBusinessService {
         recordMetricSafely(moduleMetric, "contract", request.getCodeApplicatif());
     }
 
-    public void recordLibraryGeneration(LibraryRequest request) {
-        ModuleMetric moduleMetric = createModuleMetric(request.getProductName(),
+    public void recordLibraryGeneration(Library request) {
+        Metric moduleMetric = createModuleMetric(request.getProductName(),
                 request.getCodeApplicatif(),
                 request.getType().name());
         moduleMetric.setTypeModule("library");
@@ -63,7 +63,7 @@ public class MetricBusinessService {
         recordMetricSafely(moduleMetric, "library", request.getCodeApplicatif());
     }
 
-    private void recordMetricSafely(ModuleMetric moduleMetric, String resourceType, String codeApplicatif) {
+    private void recordMetricSafely(Metric moduleMetric, String resourceType, String codeApplicatif) {
         try {
             log.debug("Recording metric for {} generation: {}", resourceType, moduleMetric.toString());
             metricProvider.recordMetric(moduleMetric);
@@ -75,8 +75,8 @@ public class MetricBusinessService {
         }
     }
 
-    private ModuleMetric createModuleMetric(String productName, String codeModule, String starterKitType) {
-        ModuleMetric moduleMetric = new ModuleMetric();
+    private Metric createModuleMetric(String productName, String codeModule, String starterKitType) {
+        Metric moduleMetric = new Metric();
         moduleMetric.setDds(ddsPrefix + productName);
         moduleMetric.setCodeModule(codeModule);
         moduleMetric.setDateInstanciation(LocalDate.now());

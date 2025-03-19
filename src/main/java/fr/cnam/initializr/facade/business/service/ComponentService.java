@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.business.service;
 
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.ComponentRequest;
+import fr.cnam.initializr.facade.business.model.Component;
 import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
 import fr.cnam.initializr.facade.business.port.ComponentProvider;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
@@ -16,16 +16,16 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ComponentBusinessService {
+public class ComponentService {
     private final ComponentProvider provider;
-    private final MetricBusinessService metricBusinessService;
+    private final MetricService metricService;
     private final ValidationService validationService;
 
-    public ComponentArchive generateComponent(ComponentRequest request) {
+    public ComponentArchive generateComponent(Component request) {
         validateRequest(request);
         validateFeatures(request);
         ComponentArchive archive = provider.generateComponent(request);
-        metricBusinessService.recordComponentGeneration(request);
+        metricService.recordComponentGeneration(request);
         return archive;
     }
 
@@ -38,13 +38,13 @@ public class ComponentBusinessService {
         return provider.getComponentFeatures(type);
     }
 
-    private void validateRequest(ComponentRequest request) {
+    private void validateRequest(Component request) {
         validationService.validateStarterKitType(request.getType());
         validationService.validateProductName(request.getProductName());
         validationService.validateCodeApplicatif(request.getCodeApplicatif());
     }
 
-    private void validateFeatures(ComponentRequest request) {
+    private void validateFeatures(Component request) {
         List<String> requestedFeatures = request.getFeatures();
         if (requestedFeatures == null || requestedFeatures.isEmpty()) {
             log.info("No features requested for type: {}, skipping validation", request.getType());

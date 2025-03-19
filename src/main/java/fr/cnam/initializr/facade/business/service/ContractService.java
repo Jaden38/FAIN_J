@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.business.service;
 
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.ContractRequest;
+import fr.cnam.initializr.facade.business.model.Contract;
 import fr.cnam.initializr.facade.business.port.ContractProvider;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
@@ -16,15 +16,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ContractBusinessService {
+public class ContractService {
     private final ContractProvider provider;
-    private final MetricBusinessService metricBusinessService;
+    private final MetricService metricService;
     private final ValidationService validationService;
 
-    public ComponentArchive generateContract(ContractRequest request) {
+    public ComponentArchive generateContract(Contract request) {
         validateRequest(request);
         ComponentArchive archive = provider.generateContract(request);
-        metricBusinessService.recordContractGeneration(request);
+        metricService.recordContractGeneration(request);
         return archive;
     }
 
@@ -32,7 +32,7 @@ public class ContractBusinessService {
         return provider.getAvailableContracts(type);
     }
 
-    private void validateRequest(ContractRequest request) {
+    private void validateRequest(Contract request) {
         validationService.validateStarterKitType(request.getType());
         validationService.validateProductName(request.getProductName());
         validationService.validateCodeApplicatif(request.getCodeApplicatif());

@@ -1,9 +1,9 @@
 package fr.cnam.initializr.facade.controller.rest;
 
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.ComponentRequest;
+import fr.cnam.initializr.facade.business.model.Component;
 import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
-import fr.cnam.initializr.facade.business.service.ComponentBusinessService;
+import fr.cnam.initializr.facade.business.service.ComponentService;
 import fr.cnam.initializr.facade.controller.mapper.ComponentMapper;
 import fr.cnam.initializr.facade.controller.rest.api.ComponentsApi;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ComponentController implements ComponentsApi {
-    private final ComponentBusinessService componentService;
+    private final ComponentService componentService;
     private final ComponentMapper mapper;
 
     @Override
@@ -33,7 +33,7 @@ public class ComponentController implements ComponentsApi {
                                                           String productName,
                                                           String codeApplicatif,
                                                           List<String> features) {
-        ComponentRequest businessRequest = mapper.toBusiness(starterKit, productName, codeApplicatif, features);
+        Component businessRequest = mapper.toBusiness(starterKit, productName, codeApplicatif, features);
         ComponentArchive archive = componentService.generateComponent(businessRequest);
 
         String filename = String.format("%s-%s.zip", productName, codeApplicatif);

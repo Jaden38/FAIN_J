@@ -3,7 +3,7 @@ package fr.cnam.initializr.facade.provider.tonic;
 import fr.cnam.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
 import fr.cnam.client.tonic.controller.rest.model.ProjectRequest;
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.ContractRequest;
+import fr.cnam.initializr.facade.business.model.Contract;
 import fr.cnam.initializr.facade.business.port.ContractProvider;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
@@ -26,7 +26,7 @@ public class TonicContractProvider implements ContractProvider {
     private final TonicMapper mapper;
 
     @Override
-    public ComponentArchive generateContract(ContractRequest request) {
+    public ComponentArchive generateContract(Contract request) {
         ProjectRequest clientRequest = mapper.toClientContractRequest(request);
 
         try {

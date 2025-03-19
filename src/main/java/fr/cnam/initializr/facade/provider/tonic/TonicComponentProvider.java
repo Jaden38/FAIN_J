@@ -3,7 +3,7 @@ package fr.cnam.initializr.facade.provider.tonic;
 import fr.cnam.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
 import fr.cnam.client.tonic.controller.rest.model.ProjectRequest;
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.ComponentRequest;
+import fr.cnam.initializr.facade.business.model.Component;
 import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
 import fr.cnam.initializr.facade.business.port.ComponentProvider;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
@@ -12,14 +12,13 @@ import fr.cnam.initializr.facade.provider.service.TonicFeaturesService;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Collections;
 import java.util.List;
 
-@Component
+@org.springframework.stereotype.Component
 @RequiredArgsConstructor
 public class TonicComponentProvider implements ComponentProvider {
 
@@ -28,7 +27,7 @@ public class TonicComponentProvider implements ComponentProvider {
     private final TonicFeaturesService featuresService;
 
     @Override
-    public ComponentArchive generateComponent(ComponentRequest businessRequest) {
+    public ComponentArchive generateComponent(Component businessRequest) {
         ProjectRequest clientRequest = mapper.toClientRequest(businessRequest);
 
         try {

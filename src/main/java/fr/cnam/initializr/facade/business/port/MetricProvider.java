@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.business.port;
 
-import fr.cnam.initializr.facade.business.model.ModuleMetric;
+import fr.cnam.initializr.facade.business.model.Metric;
 
 public interface MetricProvider {
-    void recordMetric(ModuleMetric moduleMetric);
+    void recordMetric(Metric moduleMetric);
 }

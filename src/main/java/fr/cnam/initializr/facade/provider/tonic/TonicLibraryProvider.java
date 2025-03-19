@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.provider.tonic;
 
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.LibraryRequest;
+import fr.cnam.initializr.facade.business.model.Library;
 import fr.cnam.initializr.facade.business.port.LibraryProvider;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 public class TonicLibraryProvider implements LibraryProvider {
 
     @Override
-    public ComponentArchive generateLibrary(LibraryRequest request) {
+    public ComponentArchive generateLibrary(Library request) {
         return null;
     }
 

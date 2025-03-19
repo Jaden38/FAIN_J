@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.business.service;
 
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.LibraryRequest;
+import fr.cnam.initializr.facade.business.model.Library;
 import fr.cnam.initializr.facade.business.port.LibraryProvider;
 import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
@@ -13,10 +13,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class LibraryBusinessService {
+public class LibraryService {
     private final LibraryProvider provider;
 
-    public ComponentArchive generateLibrary(LibraryRequest request) {
+    public ComponentArchive generateLibrary(Library request) {
         throw new ServiceException(CommonProblemType.RESSOURCE_NON_TROUVEE);
     }
 
@@ -24,7 +24,7 @@ public class LibraryBusinessService {
         throw new ServiceException(CommonProblemType.RESSOURCE_NON_TROUVEE);
     }
 
-    private void validateRequest(LibraryRequest request) {
+    private void validateRequest(Library request) {
         // Business validation logic
     }
 }

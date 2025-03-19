@@ -2,18 +2,17 @@ package fr.cnam.initializr.facade.provider.mapper;
 
 import fr.cnam.client.tonic.controller.rest.model.ProjectRequest;
 import fr.cnam.initializr.facade.business.model.ComponentArchive;
-import fr.cnam.initializr.facade.business.model.ComponentRequest;
-import fr.cnam.initializr.facade.business.model.ContractRequest;
-import fr.cnam.initializr.facade.business.model.LibraryRequest;
+import fr.cnam.initializr.facade.business.model.Component;
+import fr.cnam.initializr.facade.business.model.Contract;
+import fr.cnam.initializr.facade.business.model.Library;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
-@Component
+@org.springframework.stereotype.Component
 public class TonicMapper {
     private static final Map<ContractType, String> CONTRACT_FEATURES;
 
@@ -23,7 +22,7 @@ public class TonicMapper {
         CONTRACT_FEATURES.put(ContractType.AVRO, "toni-contract-avro");
     }
 
-    public ProjectRequest toClientRequest(ComponentRequest business) {
+    public ProjectRequest toClientRequest(Component business) {
         ProjectRequest request = new ProjectRequest();
         request.setDependencies(business.getFeatures());
         request.setGroupId("fr.cnam." + business.getProductName().toLowerCase());
@@ -33,7 +32,7 @@ public class TonicMapper {
         return request;
     }
 
-    public ProjectRequest toClientContractRequest(ContractRequest business) {
+    public ProjectRequest toClientContractRequest(Contract business) {
         ProjectRequest request = new ProjectRequest();
         String contractFeature = CONTRACT_FEATURES.get(business.getContractType());
         request.setDependencies(Collections.singletonList(contractFeature));
@@ -45,7 +44,7 @@ public class TonicMapper {
         return request;
     }
 
-    public ProjectRequest toLibraryContractRequest(LibraryRequest business) {
+    public ProjectRequest toLibraryContractRequest(Library business) {
         // Not implemented
         return null;
     }
