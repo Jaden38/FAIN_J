@@ -19,13 +19,11 @@ public class LibraryController implements LibrariesApi {
 
     @Override
     public ResponseEntity<Resource> createLibrary(StarterKitType starterKit, String productName, String codeApplicatif) {
-        // Not implemented
-        return ResponseEntity.notFound().build();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ResponseEntity<List<StarterKitType>> getAvailableLibraryStarterKits() {
-        // Not implemented
-        return ResponseEntity.notFound().build();
+        throw new UnsupportedOperationException();
     }
 }
