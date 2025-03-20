@@ -1,6 +1,9 @@
 package fr.cnam.initializr.facade.provider.service;
 
 import fr.cnam.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
+import fr.cnam.client.tonic.controller.rest.model.InitializrMetadata;
+import fr.cnam.client.tonic.controller.rest.model.DependencyGroup;
+import fr.cnam.client.tonic.controller.rest.model.Dependency;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
 import fr.cnam.toni.starter.core.exceptions.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -17,26 +20,31 @@ import java.util.*;
 @EnableCaching
 @RequiredArgsConstructor
 public class TonicFeaturesService {
-    private static final List<String> CONTRACT_FEATURES = Arrays.asList(
-            "toni-contract-openapi",
-            "toni-contract-avro"
-    );
-
     private final TonicProjectGenerationControllerApi tonicApi;
 
     @Cacheable(value = "tonicFeatures")
     public List<String> getAvailableFeatures() {
         try {
             log.debug("Cache miss - fetching features from TONIC service");
-            var dependencies = tonicApi.getDependencies(null);
+            InitializrMetadata metadata = tonicApi.getMetadataConfig();
 
-            if (dependencies.getDependencies() == null || dependencies.getDependencies().isEmpty()) {
+            if (metadata == null || metadata.getDependencies() == null || metadata.getDependencies().getContent() == null) {
                 log.warn("No dependencies found in TONIC service response");
                 return new ArrayList<>();
             }
 
-            Set<String> features = new HashSet<>(dependencies.getDependencies().keySet());
-            CONTRACT_FEATURES.forEach(features::remove);
+            Set<String> features = new HashSet<>();
+
+            for (DependencyGroup group : metadata.getDependencies().getContent()) {
+                if (group.getName() != null && !group.getName().equals("Contracts") && group.getContent() != null) {
+                    for (Dependency dependency : group.getContent()) {
+                        if (dependency.getId() != null) {
+                            features.add(dependency.getId());
+                        }
+                    }
+                }
+            }
+
             List<String> result = new ArrayList<>(features);
             log.debug("Retrieved {} features from TONIC service", result.size());
             return result;
