@@ -1,6 +1,7 @@
 package fr.cnam.initializr.facade.business.model;
 
-import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +10,16 @@ import java.util.List;
 @Getter
 @Setter
 public class Component {
-    private StarterKitType type;
+    @NotNull
+    private StarterKit starterKit;
+    @NotBlank
     private String productName;
+    @NotBlank
     private String codeApplicatif;
     private List<String> features;
 
-    public Component(StarterKitType type, String productName, String codeApplicatif, List<String> features) {
-        this.type = type;
+    public Component(StarterKit starterKit, String productName, String codeApplicatif, List<String> features) {
+        this.starterKit = starterKit;
         this.productName = productName;
         this.codeApplicatif = codeApplicatif;
         this.features = features;

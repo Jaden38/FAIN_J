@@ -1,59 +1,71 @@
 package fr.cnam.initializr.facade.business.service;
 
-import fr.cnam.initializr.facade.business.model.ComponentArchive;
 import fr.cnam.initializr.facade.business.model.Contract;
-import fr.cnam.initializr.facade.business.port.ContractProvider;
-import fr.cnam.initializr.facade.controller.rest.model.ContractType;
-import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
+import fr.cnam.initializr.facade.business.model.Instance;
+import fr.cnam.initializr.facade.business.model.StarterKit;
+import fr.cnam.initializr.facade.business.port.TonicProvider;
 import fr.cnam.toni.starter.core.exceptions.ClientException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ContractService {
-    private final ContractProvider provider;
+    private final TonicProvider tonicProvider;
     private final MetricService metricService;
-    private final ValidationService validationService;
+    public static final List<StarterKit> AVAILABLE_CONTRACT_STARTER_KITS = List.of(StarterKit.TONIC);
 
-    public ComponentArchive generateContract(Contract request) {
-        validateRequest(request);
-        ComponentArchive archive = provider.generateContract(request);
-        metricService.recordContractGeneration(request);
-        return archive;
-    }
+    public Instance generateContract(@Valid Contract contract) {
+        validateContractStarterKit(contract.getStarterKit());
+        validateContractType(contract.getStarterKit(), contract.getContractType());
 
-    public List<ContractType> getAvailableContracts(StarterKitType type) {
-        return provider.getAvailableContracts(type);
-    }
-
-    private void validateRequest(Contract request) {
-        validationService.validateStarterKitType(request.getType());
-        validationService.validateProductName(request.getProductName());
-        validationService.validateCodeApplicatif(request.getCodeApplicatif());
-        validateContractType(request.getContractType());
-    }
-
-    private void validateContractType(ContractType contractType) {
-        if (contractType == null) {
-            log.warn("Contract type cannot be null");
-            throw new ClientException(
-                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
-                    "Contract type cannot be null"
-            );
+        Instance instance = null;
+        if (contract.getStarterKit() == StarterKit.TONIC) {
+            instance = tonicProvider.generateContract(contract);
         }
 
-        List<ContractType> availableContractTypes = getAvailableContracts(StarterKitType.TONIC);
+        metricService.recordContractGeneration(contract);
+
+        return instance;
+    }
+
+    public List<String> getAvailableContracts(StarterKit starterKit) {
+        List<String> contractTypes = Collections.emptyList();
+
+        if (starterKit == StarterKit.TONIC) {
+            contractTypes = tonicProvider.getAvailableContracts();
+        }
+
+        return contractTypes;
+    }
+
+    private void validateContractType(StarterKit starterKit, String contractType) {
+        List<String> availableContractTypes = Collections.emptyList();
+        if (starterKit.equals(StarterKit.TONIC)) {
+            availableContractTypes = tonicProvider.getAvailableContracts();
+        }
+
         if (!availableContractTypes.contains(contractType)) {
-            log.warn("Invalid contract type: {}. Available contract types are: {}", contractType, availableContractTypes);
+            throw new ClientException(CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
+                    "Invalid contract type: " + contractType + ". Available contract types are: " + availableContractTypes
+            );
+        }
+    }
+
+    public void validateContractStarterKit(StarterKit starterKit) {
+        if (AVAILABLE_CONTRACT_STARTER_KITS.stream().noneMatch(availableStarterKit -> availableStarterKit.equals(starterKit))) {
             throw new ClientException(
                     CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
-                    "Invalid contract type: " + contractType + ". Available contract types are: " + availableContractTypes
+                    "Invalid starter kit starterKit: " + starterKit + ". Available contract types are: " + AVAILABLE_CONTRACT_STARTER_KITS
             );
         }
     }

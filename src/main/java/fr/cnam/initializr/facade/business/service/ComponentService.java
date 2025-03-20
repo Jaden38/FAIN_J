@@ -1,62 +1,79 @@
 package fr.cnam.initializr.facade.business.service;
 
-import fr.cnam.initializr.facade.business.model.ComponentArchive;
+import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.Component;
-import fr.cnam.initializr.facade.business.model.StarterKitBusiness;
-import fr.cnam.initializr.facade.business.port.ComponentProvider;
-import fr.cnam.initializr.facade.controller.rest.model.StarterKitType;
+import fr.cnam.initializr.facade.business.model.StarterKit;
+import fr.cnam.initializr.facade.business.port.TonicProvider;
 import fr.cnam.toni.starter.core.exceptions.ClientException;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Validated
 public class ComponentService {
-    private final ComponentProvider provider;
     private final MetricService metricService;
-    private final ValidationService validationService;
+    private final TonicProvider tonicProvider;
+    public static final List<StarterKit> AVAILABLE_COMPONENT_STARTER_KITS = List.of(StarterKit.TONIC);
 
-    public ComponentArchive generateComponent(Component request) {
-        validateRequest(request);
-        validateFeatures(request);
-        ComponentArchive archive = provider.generateComponent(request);
-        metricService.recordComponentGeneration(request);
-        return archive;
+    public Instance generateComponent(@Valid Component component) {
+        validateComponentStarterKit(component.getStarterKit());
+        validateFeatures(component);
+
+        Instance instance = null;
+        if (component.getStarterKit() == StarterKit.TONIC) {
+            instance = tonicProvider.generateComponent(component);
+        }
+
+        metricService.recordComponentGeneration(component);
+
+        return instance;
     }
 
-    public List<StarterKitBusiness> getAvailableComponents() {
-        return provider.getAvailableComponents();
+    public List<StarterKit> getAvailableStarterKits() {
+        return AVAILABLE_COMPONENT_STARTER_KITS;
     }
 
-    public List<String> getComponentFeatures(StarterKitType type) {
-        validationService.validateStarterKitType(type);
-        return provider.getComponentFeatures(type);
+    public List<String> getComponentFeatures(StarterKit starterKit) {
+        validateComponentStarterKit(starterKit);
+
+        List<String> features = Collections.emptyList();
+        if (starterKit == StarterKit.TONIC) {
+            features = tonicProvider.getComponentFeatures();
+        }
+
+        return features;
     }
 
-    private void validateRequest(Component request) {
-        validationService.validateStarterKitType(request.getType());
-        validationService.validateProductName(request.getProductName());
-        validationService.validateCodeApplicatif(request.getCodeApplicatif());
+    public void validateComponentStarterKit(StarterKit starterKit) {
+        if (AVAILABLE_COMPONENT_STARTER_KITS.stream().noneMatch(availableStarterKit -> availableStarterKit.equals(starterKit))) {
+            throw new ClientException(
+                    CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
+                    "Invalid starter kit : " + starterKit + ". Available starter kits are: " + AVAILABLE_COMPONENT_STARTER_KITS
+            );
+        }
     }
 
-    private void validateFeatures(Component request) {
-        List<String> requestedFeatures = request.getFeatures();
+    private void validateFeatures(Component component) {
+        List<String> requestedFeatures = component.getFeatures();
         if (requestedFeatures == null || requestedFeatures.isEmpty()) {
-            log.info("No features requested for type: {}, skipping validation", request.getType());
+            log.info("No features requested for type: {}, skipping validation", component.getStarterKit());
             return;
         }
 
-        List<String> availableFeatures = getComponentFeatures(request.getType());
+        List<String> availableFeatures = getComponentFeatures(component.getStarterKit());
         if (availableFeatures.isEmpty()) {
-            log.warn("No features available for starter kit type: {}", request.getType());
             throw new ClientException(
                     CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
-                    "No features available for starter kit type: " + request.getType()
+                    "No features available for starter kit type: " + component.getStarterKit()
             );
         }
 
@@ -65,9 +82,6 @@ public class ComponentService {
                 .toList();
 
         if (!invalidFeatures.isEmpty()) {
-            log.warn("Invalid features requested for type {}: {}", request.getType(), invalidFeatures);
-            log.debug("Available features are: {}", availableFeatures);
-
             throw new ClientException(
                     CommonProblemType.DONNEES_INVALIDES_MSG_AVEC_PROBLEMES,
                     String.format("%s. Available features are: %s",
@@ -75,7 +89,7 @@ public class ComponentService {
             );
         }
 
-        log.info("Successfully validated {} features for type {}", requestedFeatures.size(), request.getType());
+        log.info("Successfully validated {} features for type {}", requestedFeatures.size(), component.getStarterKit());
         log.debug("Validated features: {}", requestedFeatures);
     }
 }

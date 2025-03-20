@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.provider.mapper;
 
 import fr.cnam.client.tonic.controller.rest.model.ProjectRequest;
-import fr.cnam.initializr.facade.business.model.ComponentArchive;
+import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.Component;
 import fr.cnam.initializr.facade.business.model.Contract;
 import fr.cnam.initializr.facade.business.model.Library;
@@ -49,7 +49,7 @@ public class TonicMapper {
         return null;
     }
 
-    public ComponentArchive toBusinessArchive(byte[] zipContent) {
-        return new ComponentArchive(new ByteArrayResource(zipContent));
+    public Instance toBusinessArchive(byte[] zipContent) {
+        return new Instance(new ByteArrayResource(zipContent));
     }
 }

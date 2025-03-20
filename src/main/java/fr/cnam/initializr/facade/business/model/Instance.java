@@ -6,10 +6,10 @@ import org.springframework.core.io.Resource;
 
 @Getter
 @Setter
-public class ComponentArchive {
+public class Instance {
     private Resource content;
 
-    public ComponentArchive(Resource content) {
+    public Instance(Resource content) {
         this.content = content;
     }
 }
