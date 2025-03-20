@@ -21,7 +21,6 @@ public class MetricClientConfig {
 
     @Value("${initializer.metric.url}")
     private String metricServiceUrl;
-    private ObjectMapper objectMapper;
 
     @Bean
     @ConditionalOnProperty(name = "initializer.metric.mock", havingValue = "false", matchIfMissing = true)
