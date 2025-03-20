@@ -1,9 +1,6 @@
 package fr.cnam.initializr.facade.business.service;
 
-import fr.cnam.initializr.facade.business.model.Component;
-import fr.cnam.initializr.facade.business.model.Contract;
-import fr.cnam.initializr.facade.business.model.Library;
-import fr.cnam.initializr.facade.business.model.Metric;
+import fr.cnam.initializr.facade.business.model.*;
 import fr.cnam.initializr.facade.business.port.MetricProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +31,7 @@ public class MetricService {
     public void recordComponentGeneration(Component request) {
         Metric moduleMetric = createModuleMetric(request.getProductName(),
                 request.getCodeApplicatif(),
-                request.getType().getValue());
+                request.getStarterKit());
         moduleMetric.setTypeModule(determineComponentType(request.getCodeApplicatif()));
 
         if (request.getFeatures() != null && !request.getFeatures().isEmpty()) {
@@ -47,9 +44,9 @@ public class MetricService {
     public void recordContractGeneration(Contract request) {
         Metric moduleMetric = createModuleMetric(request.getProductName(),
                 request.getCodeApplicatif(),
-                request.getType().name());
+                request.getStarterKit());
         moduleMetric.setTypeModule("contract");
-        moduleMetric.setUsecases(request.getContractType().name().toLowerCase());
+        moduleMetric.setUsecases(request.getContractType().toLowerCase());
 
         recordMetricSafely(moduleMetric, "contract", request.getCodeApplicatif());
     }
@@ -57,7 +54,7 @@ public class MetricService {
     public void recordLibraryGeneration(Library request) {
         Metric moduleMetric = createModuleMetric(request.getProductName(),
                 request.getCodeApplicatif(),
-                request.getType().name());
+                request.getStarterKit());
         moduleMetric.setTypeModule("library");
 
         recordMetricSafely(moduleMetric, "library", request.getCodeApplicatif());
@@ -75,13 +72,13 @@ public class MetricService {
         }
     }
 
-    private Metric createModuleMetric(String productName, String codeModule, String starterKitType) {
+    private Metric createModuleMetric(String productName, String codeModule, StarterKit starterKit) {
         Metric moduleMetric = new Metric();
         moduleMetric.setDds(ddsPrefix + productName);
         moduleMetric.setCodeModule(codeModule);
         moduleMetric.setDateInstanciation(LocalDate.now());
-        moduleMetric.setTypeSK(starterKitType);
-        moduleMetric.setVersionSK(determineVersion(starterKitType));
+        moduleMetric.setTypeSK(starterKit.name());
+        moduleMetric.setVersionSK(determineVersion(starterKit));
         return moduleMetric;
     }
 
@@ -102,12 +99,11 @@ public class MetricService {
         };
     }
 
-    private String determineVersion(String starterKitType) {
-        return switch (starterKitType) {
-            case "TONIC" -> tonicVersion;
-            case "STUMP" -> stumpVersion;
-            case "HUMAN" -> humanVersion;
-            default -> "1.0.0";
+    private String determineVersion(StarterKit starterKit) {
+        return switch (starterKit) {
+            case TONIC -> tonicVersion;
+            case STUMP -> stumpVersion;
+            case HUMAN -> humanVersion;
         };
     }
 }

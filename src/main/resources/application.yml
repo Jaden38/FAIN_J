@@ -2,8 +2,9 @@ initializer:
   tonic:
     url: ${TONIC_URL}
   metric:
-    url: ${METRIC_URL:#{null}}
+    url: ${METRIC_URL}
     dds-prefix: ""
+    mock: false
   starter-kit:
     versions:
       TONIC: 1.3.0

@@ -2,9 +2,10 @@ initializer:
   tonic:
     url: http://localhost:8080
   metric:
-#    url: http://152101lj1w.csh-dijon.ramage:9002/poc-metrique-instances-stump/public/rest
+    # url: http://152101lj1w.csh-dijon.ramage:9002/poc-metrique-instances-stump/public/rest
     # Alternative local URL
-     url: http://localhost:9002/poc-metrique-instances-stump/public/rest
+    url: http://localhost:9002/poc-metrique-instances-stump/public/rest
+    mock: true
 
 server:
   port: 9000
