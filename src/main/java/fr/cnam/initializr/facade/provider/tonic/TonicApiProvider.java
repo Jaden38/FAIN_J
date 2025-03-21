@@ -2,9 +2,10 @@ package fr.cnam.initializr.facade.provider.tonic;
 
 import fr.cnam.client.tonic.controller.rest.api.TonicProjectGenerationControllerApi;
 import fr.cnam.client.tonic.controller.rest.model.ProjectRequest;
-import fr.cnam.initializr.facade.business.model.*;
+import fr.cnam.initializr.facade.business.model.Component;
+import fr.cnam.initializr.facade.business.model.Contract;
+import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.port.TonicProvider;
-import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import fr.cnam.initializr.facade.provider.mapper.TonicMapper;
 import fr.cnam.initializr.facade.provider.service.TonicFeaturesService;
 import fr.cnam.toni.starter.core.exceptions.CommonProblemType;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
-import java.util.Arrays;
 import java.util.List;
 
 @org.springframework.stereotype.Component
@@ -27,7 +27,6 @@ public class TonicApiProvider implements TonicProvider {
     @Override
     public Instance generateComponent(Component component) {
         ProjectRequest projectRequest = mapper.toClientRequest(component);
-
         return getInstance(projectRequest);
     }
 
@@ -51,9 +50,7 @@ public class TonicApiProvider implements TonicProvider {
             );
 
             byte[] content = responseSpec.body(byte[].class);
-
             return mapper.toBusinessArchive(content);
-
         } catch (RestClientResponseException e) {
             throw new ServiceException(CommonProblemType.ERREUR_INATTENDUE, e);
         }
@@ -64,16 +61,14 @@ public class TonicApiProvider implements TonicProvider {
         return featuresService.getAvailableFeatures();
     }
 
-
     @Override
     public Instance generateContract(Contract contract) {
         ProjectRequest projectRequest = mapper.toClientContractRequest(contract);
-
         return getInstance(projectRequest);
     }
 
     @Override
     public List<String> getAvailableContracts() {
-        return Arrays.asList(ContractType.OPENAPI.name(), ContractType.AVRO.name());
+        return featuresService.getAvailableContracts();
     }
 }

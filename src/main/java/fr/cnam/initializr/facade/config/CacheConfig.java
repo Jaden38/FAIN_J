@@ -26,23 +26,22 @@ public class CacheConfig {
     /**
      * Configure et fournit le gestionnaire de cache pour l'application.
      * <p>
-     * Cette méthode crée un ConcurrentMapCacheManager qui gère un unique cache nommé "tonicFeatures".
-     * Ce cache est utilisé pour stocker les fonctionnalités disponibles de TONIC avec un TTL configurable.
+     * Cette méthode crée un ConcurrentMapCacheManager qui gère les caches pour les fonctionnalités TONIC.
      *
      * @return Le gestionnaire de cache configuré
      */
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("tonicFeatures");
+        return new ConcurrentMapCacheManager("tonicFeaturesByCategory");
     }
 
     /**
-     * Vide le cache des fonctionnalités TONIC selon l'intervalle TTL configuré.
-     * Cette méthode est appelée automatiquement pour rafraîchir le cache.
+     * Vide les caches des fonctionnalités TONIC selon l'intervalle TTL configuré.
+     * Cette méthode est appelée automatiquement pour rafraîchir les caches.
      */
-    @CacheEvict(value = "tonicFeatures", allEntries = true)
+    @CacheEvict(cacheNames = "tonicFeaturesByCategory", allEntries = true)
     @Scheduled(fixedRateString = "${cache.tonic-features.ttl}")
-    public void evictTonicFeaturesCache() {
-        log.info("Emptying tonicFeatures cache");
+    public void evictTonicCaches() {
+        log.info("Emptying TONIC features cache");
     }
 }
