@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class TonicFeaturesService {
     private static final String CONTRACTS_GROUP = "Contracts";
 
-    private final TonicFeaturesCachingService cachingService;
+    private final TonicCachingService cachingService;
 
     public List<String> getAvailableFeatures() {
         Map<String, List<String>> featuresByCategory = cachingService.getAllFeaturesByCategory();
