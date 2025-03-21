@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.controller.rest;
 
-import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.Contract;
+import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.StarterKit;
 import fr.cnam.initializr.facade.business.service.ContractService;
 import fr.cnam.initializr.facade.controller.mapper.ContractMapper;
@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

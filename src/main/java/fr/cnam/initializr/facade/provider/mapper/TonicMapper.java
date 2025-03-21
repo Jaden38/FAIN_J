@@ -1,9 +1,9 @@
 package fr.cnam.initializr.facade.provider.mapper;
 
 import fr.cnam.client.tonic.controller.rest.model.ProjectRequest;
-import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.Component;
 import fr.cnam.initializr.facade.business.model.Contract;
+import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.Library;
 import fr.cnam.initializr.facade.controller.rest.model.ContractType;
 import org.springframework.core.io.ByteArrayResource;

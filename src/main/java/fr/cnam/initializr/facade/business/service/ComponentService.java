@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.business.service;
 
-import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.Component;
+import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.StarterKit;
 import fr.cnam.initializr.facade.business.port.TonicProvider;
 import fr.cnam.toni.starter.core.exceptions.ClientException;

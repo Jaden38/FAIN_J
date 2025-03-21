@@ -1,6 +1,8 @@
 package fr.cnam.initializr.facade.business.port;
 
-import fr.cnam.initializr.facade.business.model.*;
+import fr.cnam.initializr.facade.business.model.Component;
+import fr.cnam.initializr.facade.business.model.Contract;
+import fr.cnam.initializr.facade.business.model.Instance;
 
 import java.util.List;
 

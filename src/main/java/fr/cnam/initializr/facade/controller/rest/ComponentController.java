@@ -1,7 +1,7 @@
 package fr.cnam.initializr.facade.controller.rest;
 
-import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.Component;
+import fr.cnam.initializr.facade.business.model.Instance;
 import fr.cnam.initializr.facade.business.model.StarterKit;
 import fr.cnam.initializr.facade.business.service.ComponentService;
 import fr.cnam.initializr.facade.controller.mapper.ComponentMapper;
