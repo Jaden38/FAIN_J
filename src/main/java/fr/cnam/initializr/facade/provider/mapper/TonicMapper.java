@@ -34,9 +34,11 @@ public class TonicMapper {
 
     public ProjectRequest toClientContractRequest(Contract business) {
         ProjectRequest request = new ProjectRequest();
-        String contractFeature = CONTRACT_FEATURES.get(business.getContractType());
-        request.setDependencies(Collections.singletonList(contractFeature));
 
+        ContractType contractType = ContractType.fromValue(business.getContractType());
+        String contractFeature = CONTRACT_FEATURES.get(contractType);
+
+        request.setDependencies(Collections.singletonList(contractFeature));
         request.setGroupId("fr.cnam." + business.getProductName().toLowerCase());
         request.setArtifactId(business.getCodeApplicatif().toLowerCase());
         request.setName(business.getProductName());
