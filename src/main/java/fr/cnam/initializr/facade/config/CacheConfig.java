@@ -23,22 +23,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 public class CacheConfig {
 
-    /**
-     * Configure et fournit le gestionnaire de cache pour l'application.
-     * <p>
-     * Cette méthode crée un ConcurrentMapCacheManager qui gère les caches pour les fonctionnalités TONIC.
-     *
-     * @return Le gestionnaire de cache configuré
-     */
     @Bean
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager("tonicFeaturesByCategory");
     }
 
-    /**
-     * Vide les caches des fonctionnalités TONIC selon l'intervalle TTL configuré.
-     * Cette méthode est appelée automatiquement pour rafraîchir les caches.
-     */
     @CacheEvict(cacheNames = "tonicFeaturesByCategory", allEntries = true)
     @Scheduled(fixedRateString = "${cache.tonic-features.ttl}")
     public void evictTonicCaches() {
